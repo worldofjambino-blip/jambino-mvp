@@ -72,7 +72,6 @@ const FilterPanel = ({ filters, onFilterChange }) => {
   return (
     <div className="filter-panel">
       <h3 className="filter-title">🎪 Filter</h3>
-      
       <div className="filter-section">
         <label className="section-title">📍 Altersgruppen</label>
         <div className="filter-buttons">
@@ -92,7 +91,6 @@ const FilterPanel = ({ filters, onFilterChange }) => {
           ))}
         </div>
       </div>
-
       <button
         className="filter-reset"
         onClick={() => onFilterChange({ ageGroups: [], equipment: [], amenities: [] })}
@@ -114,12 +112,12 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground }) => {
             className="list-item"
             onClick={() => onSelectPlayground(pg)}
           >
-            <img src={pg.coverImage} alt={pg.name} className="list-item-image" />
+            <img src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={pg.name} className="list-item-image" />
             <div className="list-item-content">
               <h4 className="list-item-title">{pg.name}</h4>
               <p className="list-item-location">{pg.city}</p>
               <div className="list-item-rating">
-                <span>{'⭐'.repeat(Math.floor(pg.rating))}</span>
+                <span>{'⭐'.repeat(Math.floor(pg.rating || 4))}</span>
               </div>
             </div>
           </div>
@@ -131,16 +129,15 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground }) => {
 
 const PlaygroundModal = ({ playground, onClose }) => {
   if (!playground) return null;
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
-        <img src={playground.coverImage} alt={playground.name} className="modal-image" />
+        <img src={playground.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={playground.name} className="modal-image" />
         <div className="modal-body">
           <h2 className="modal-title">{playground.name}</h2>
           <p className="modal-description">{playground.description}</p>
-          <p className="modal-location">📍 {playground.city}, {playground.country}</p>
+          <p className="modal-location">📍 {playground.city}</p>
           <div className="modal-rating">⭐ {playground.rating} ({playground.reviews} Bewertungen)</div>
         </div>
       </div>
@@ -148,38 +145,33 @@ const PlaygroundModal = ({ playground, onClose }) => {
   );
 };
 
-export default function JambinoMVP({ initialPlaygrounds = MOCK_PLAYGROUNDS }) {
+export default function JambinoMVP() {
+  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
-  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
-useEffect(() => {
-  fetchSpielplaetze().then(data => {
-    if (data && data.length > 0) setPlaygrounds(data);
-  }).catch(() => {});
-}, []);
   const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    fetchSpielplaetze().then(data => {
-      if (data && data.length > 0) setPlaygrounds(data);
-    }).catch(() => {});
+    fetchSpielplaetze()
+      .then(data => {
+        if (data && data.length > 0) setPlaygrounds(data);
+      })
+      .catch(() => {});
   }, []);
 
   const filteredPlaygrounds = useMemo(() => {
-    return initialPlaygrounds.filter(pg => {
-      const matchesSearch = 
+    return playgrounds.filter(pg => {
+      const matchesSearch =
         pg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pg.city.toLowerCase().includes(searchTerm.toLowerCase());
-
+        (pg.city && pg.city.toLowerCase().includes(searchTerm.toLowerCase()));
       if (!matchesSearch) return false;
-
       if (filters.ageGroups.length > 0) {
-        const hasMatchingAge = filters.ageGroups.some(age => pg.ageGroups.includes(age));
+        const hasMatchingAge = filters.ageGroups.some(age => pg.ageGroups && pg.ageGroups.includes(age));
         if (!hasMatchingAge) return false;
       }
-
       return true;
     });
-  }, [filters, searchTerm, initialPlaygrounds]);
+  }, [filters, searchTerm, playgrounds]);
 
   return (
     <div className="jambino-app">
@@ -201,7 +193,7 @@ useEffect(() => {
       <div className="main-layout">
         <div className="sidebar">
           <FilterPanel filters={filters} onFilterChange={setFilters} />
-          <PlaygroundList 
+          <PlaygroundList
             playgrounds={filteredPlaygrounds}
             onSelectPlayground={setSelectedPlayground}
           />
@@ -214,32 +206,32 @@ useEffect(() => {
               attribution='&copy; OpenStreetMap'
             />
             {filteredPlaygrounds.map(pg => (
-<Marker
-  key={pg.id}
-  position={[pg.latitude, pg.longitude]}
-  icon={L.icon({
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  })}
-  eventHandlers={{
-    click: () => setSelectedPlayground(pg),
-  }}
->
-  <Popup>
-    <h3>{pg.name}</h3>
-    <p>{pg.city}</p>
-  </Popup>
-</Marker>
+              <Marker
+                key={pg.id}
+                position={[pg.latitude, pg.longitude]}
+                icon={L.icon({
+                  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                  popupAnchor: [1, -34],
+                  shadowSize: [41, 41]
+                })}
+                eventHandlers={{
+                  click: () => setSelectedPlayground(pg),
+                }}
+              >
+                <Popup>
+                  <h3>{pg.name}</h3>
+                  <p>{pg.city}</p>
+                </Popup>
+              </Marker>
             ))}
           </MapContainer>
         </div>
       </div>
 
-      <PlaygroundModal 
+      <PlaygroundModal
         playground={selectedPlayground}
         onClose={() => setSelectedPlayground(null)}
       />
