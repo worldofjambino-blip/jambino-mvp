@@ -1,0 +1,60 @@
+.loading-screen,
+.error-screen,
+.empty-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-screen {
+  background: linear-gradient(135deg, #FF8C42, #2ECC71);
+  color: white;
+}
+
+.loading-screen h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-screen {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.error-screen h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-screen {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
