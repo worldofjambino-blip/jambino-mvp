@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import JambinoMVP from './components/JambinoMVP';
-import { fetchPlaygroundsFromSheets, startSheetSync } from './api/googleSheets.js';
+import { fetchSpielplaetze,  } from './api/googleSheets.js';
 import './App.css';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
     const loadPlaygrounds = async () => {
       try {
         setLoading(true);
-        const data = await fetchPlaygroundsFromSheets();
+        const data = await fetchSpielplaetze();
         setPlaygrounds(data);
         setError(null);
       } catch (err) {
@@ -25,7 +25,7 @@ function App() {
 
     loadPlaygrounds();
 
-    const stopSync = startSheetSync(setPlaygrounds, 5);
+    const stopSync = (setPlaygrounds, 5);
 
     return stopSync;
   }, []);
