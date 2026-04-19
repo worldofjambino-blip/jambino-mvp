@@ -152,6 +152,7 @@ export default function JambinoMVP({ initialPlaygrounds = MOCK_PLAYGROUNDS }) {
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
+  useEffect(() => { fetchSpielplaetze().then(data => { if (data && data.length > 0) setPlaygrounds(data); }).catch(() => {}); }, []);
 useEffect(() => {
   fetchSpielplaetze().then(data => {
     if (data && data.length > 0) setPlaygrounds(data);
