@@ -151,7 +151,19 @@ const PlaygroundModal = ({ playground, onClose }) => {
 export default function JambinoMVP({ initialPlaygrounds = MOCK_PLAYGROUNDS }) {
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
+  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
+useEffect(() => {
+  fetchSpielplaetze().then(data => {
+    if (data && data.length > 0) setPlaygrounds(data);
+  }).catch(() => {});
+}, []);
   const [searchTerm, setSearchTerm] = useState('');
+  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
+  useEffect(() => {
+    fetchSpielplaetze().then(data => {
+      if (data && data.length > 0) setPlaygrounds(data);
+    }).catch(() => {});
+  }, []);
 
   const filteredPlaygrounds = useMemo(() => {
     return initialPlaygrounds.filter(pg => {
