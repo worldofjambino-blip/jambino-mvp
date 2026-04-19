@@ -158,7 +158,6 @@ useEffect(() => {
   }).catch(() => {});
 }, []);
   const [searchTerm, setSearchTerm] = useState('');
-  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   useEffect(() => {
     fetchSpielplaetze().then(data => {
       if (data && data.length > 0) setPlaygrounds(data);
