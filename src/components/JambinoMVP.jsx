@@ -147,6 +147,12 @@ const PlaygroundModal = ({ playground, onClose }) => {
 
 export default function JambinoMVP() {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
+  const [activeTab, setActiveTab] = useState('entdecken');
+  const [favorites, setFavorites] = useState([]);
+
+  const toggleFavorite = (id) => {
+    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
