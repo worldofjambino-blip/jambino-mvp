@@ -226,7 +226,7 @@ input, textarea, select {
 .filter-panel {
   padding: var(--spacing-md);
   border-bottom: 2px solid var(--border-color);
-  background: linear-gradient(180deg, white 0%, var(--light-green) 100%);
+  background: var(--bg-light);
 }
 
 .filter-title {
