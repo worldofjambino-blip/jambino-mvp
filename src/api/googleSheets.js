@@ -30,7 +30,7 @@ export async function fetchSpielplaetze() {
         description: cols[9]?.trim() || '',
         kategorie: cols[10]?.trim() || '',
         altersempfehlung: cols[11]?.trim() || '',
-        coverImage: cols[8]?.trim() || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600',
+        coverImage: 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600',
         rating: (4 + Math.random()).toFixed(1),
         reviews: Math.floor(Math.random() * 30) + 5,
         ageGroups: cols[11]?.trim() ? [cols[11].trim()] : ['0-14'],
