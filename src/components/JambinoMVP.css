@@ -13,8 +13,8 @@
 
   --text-dark: #2C3E50;
   --text-light: #7F8C8D;
-  --bg-light: #FFFFFF;
-  --bg-gray: #F5F7FA;
+  --bg-light: #FFF8EF;
+  --bg-gray: #FFFFFF;
   --border-color: #E0E6ED;
 
   --shadow-sm: 0 2px 8px rgba(26, 58, 82, 0.08);
@@ -45,7 +45,7 @@ html {
 
 body {
   font-family: var(--font-body);
-  color: var(--text-dark);
+  color: var(--primary-orange);
   background-color: var(--bg-light);
   line-height: 1.6;
 }
@@ -64,8 +64,8 @@ input, textarea, select {
 }
 
 .app-header {
-  background: linear-gradient(135deg, var(--light-orange) 0%, var(--light-green) 100%);
-  color: var(--text-dark);
+  background: var(--bg-gray);
+  color: var(--primary-orange);
   padding: var(--spacing-lg) var(--spacing-md);
   box-shadow: var(--shadow-md);
   position: relative;
@@ -211,7 +211,7 @@ input, textarea, select {
 
 .popup-button {
   background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
-  color: var(--text-dark);
+  color: var(--primary-orange);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
@@ -264,7 +264,7 @@ input, textarea, select {
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--primary-orange);
   background: white;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -279,7 +279,7 @@ input, textarea, select {
 
 .filter-btn.active {
   background: var(--primary-orange);
-  color: var(--text-dark);
+  color: var(--primary-orange);
   border-color: var(--primary-orange);
   box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
 }
@@ -304,8 +304,8 @@ input, textarea, select {
 
 .filter-reset:hover {
   background: var(--bg-gray);
-  border-color: var(--text-dark);
-  color: var(--text-dark);
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
 }
 
 .list-container {
@@ -490,7 +490,7 @@ input, textarea, select {
   right: 0;
   padding: var(--spacing-lg) var(--spacing-md);
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
-  color: var(--text-dark);
+  color: var(--primary-orange);
 }
 
 .modal-title {
@@ -523,7 +523,7 @@ input, textarea, select {
 .modal-description {
   font-size: 0.95rem;
   line-height: 1.7;
-  color: var(--text-dark);
+  color: var(--primary-orange);
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border-color);
@@ -605,8 +605,8 @@ input, textarea, select {
   width: 100%;
   padding: var(--spacing-md);
   margin-top: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--light-orange) 0%, var(--light-green) 100%);
-  color: var(--text-dark);
+  background: var(--bg-gray);
+  color: var(--primary-orange);
   font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 700;
