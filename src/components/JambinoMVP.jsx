@@ -101,7 +101,7 @@ const FilterPanel = ({ filters, onFilterChange }) => {
   );
 };
 
-const PlaygroundList = ({ playgrounds, onSelectPlayground }) => {
+const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFavorite }) => {
   return (
     <div className="list-container">
       <h3 className="list-title">📍 Spielplätze ({playgrounds.length})</h3>
@@ -120,6 +120,13 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground }) => {
                 <span>{'⭐'.repeat(Math.floor(pg.rating || 4))}</span>
               </div>
             </div>
+            <button
+              className="favorite-btn"
+              onClick={(e) => { e.stopPropagation(); onToggleFavorite(pg.id); }}
+              aria-label="Favorit umschalten"
+            >
+              {favorites.includes(pg.id) ? '❤️' : '🤍'}
+            </button>
           </div>
         ))}
       </div>
@@ -149,13 +156,13 @@ export default function JambinoMVP() {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   const [activeTab, setActiveTab] = useState('entdecken');
   const [favorites, setFavorites] = useState([]);
+  const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
+  const [selectedPlayground, setSelectedPlayground] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
-  const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
-  const [selectedPlayground, setSelectedPlayground] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchSpielplaetze()
@@ -179,6 +186,10 @@ export default function JambinoMVP() {
     });
   }, [filters, searchTerm, playgrounds]);
 
+  const favoritePlaygrounds = useMemo(() => {
+    return playgrounds.filter(pg => favorites.includes(pg.id));
+  }, [playgrounds, favorites]);
+
   return (
     <div className="jambino-app">
       <header className="app-header">
@@ -196,45 +207,102 @@ export default function JambinoMVP() {
         />
       </div>
 
-      <div className="main-layout">
-        <div className="sidebar">
-          <FilterPanel filters={filters} onFilterChange={setFilters} />
-          <PlaygroundList
-            playgrounds={filteredPlaygrounds}
-            onSelectPlayground={setSelectedPlayground}
-          />
-        </div>
-
-        <div className="map-container">
-          <MapContainer center={[47.75, 8.95]} zoom={9} className="leaflet-map">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; OpenStreetMap'
+      {activeTab === 'entdecken' && (
+        <div className="main-layout">
+          <div className="sidebar">
+            <FilterPanel filters={filters} onFilterChange={setFilters} />
+            <PlaygroundList
+              playgrounds={filteredPlaygrounds}
+              onSelectPlayground={setSelectedPlayground}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
             />
-            {filteredPlaygrounds.map(pg => (
-              <Marker
-                key={pg.id}
-                position={[pg.latitude, pg.longitude]}
-                icon={L.icon({
-                  iconUrl: '/jambino-pin.svg',
-                  
-                  iconSize: [28, 40],
-                  iconAnchor: [14, 40],
-                  popupAnchor: [0, -40],
-                })}
-                eventHandlers={{
-                  click: () => setSelectedPlayground(pg),
-                }}
-              >
-                <Popup>
-                  <h3>{pg.name}</h3>
-                  <p>{pg.city}</p>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+          </div>
+
+          <div className="map-container">
+            <MapContainer center={[47.75, 8.95]} zoom={9} className="leaflet-map">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; OpenStreetMap'
+              />
+              {filteredPlaygrounds.map(pg => (
+                <Marker
+                  key={pg.id}
+                  position={[pg.latitude, pg.longitude]}
+                  icon={L.icon({
+                    iconUrl: '/jambino-pin.svg',
+                    iconSize: [28, 40],
+                    iconAnchor: [14, 40],
+                    popupAnchor: [0, -40],
+                  })}
+                  eventHandlers={{
+                    click: () => setSelectedPlayground(pg),
+                  }}
+                >
+                  <Popup>
+                    <h3>{pg.name}</h3>
+                    <p>{pg.city}</p>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'favoriten' && (
+        <div className="main-layout">
+          <div className="sidebar" style={{ width: '100%' }}>
+            <div className="list-container">
+              <h3 className="list-title">❤️ Favoriten ({favoritePlaygrounds.length})</h3>
+              {favoritePlaygrounds.length === 0 ? (
+                <p style={{ padding: 'var(--spacing-md) 0', color: 'var(--text-light)' }}>
+                  Noch keine Favoriten gespeichert. Tippe auf das Herz bei einem Spielplatz!
+                </p>
+              ) : (
+                <div className="list">
+                  {favoritePlaygrounds.map(pg => (
+                    <div key={pg.id} className="list-item" onClick={() => setSelectedPlayground(pg)}>
+                      <img src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={pg.name} className="list-item-image" />
+                      <div className="list-item-content">
+                        <h4 className="list-item-title">{pg.name}</h4>
+                        <p className="list-item-location">{pg.city}</p>
+                        <div className="list-item-rating">
+                          <span>{'⭐'.repeat(Math.floor(pg.rating || 4))}</span>
+                        </div>
+                      </div>
+                      <button
+                        className="favorite-btn"
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(pg.id); }}
+                        aria-label="Favorit entfernen"
+                      >
+                        ❤️
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <nav className="bottom-nav">
+        <button
+          className={`bottom-nav-item ${activeTab === 'entdecken' ? 'active' : ''}`}
+          onClick={() => setActiveTab('entdecken')}
+        >
+          <span className="bottom-nav-icon">📍</span>
+          <span>Entdecken</span>
+        </button>
+        <button
+          className={`bottom-nav-item ${activeTab === 'favoriten' ? 'active' : ''}`}
+          onClick={() => setActiveTab('favoriten')}
+        >
+          <span className="bottom-nav-icon">❤️</span>
+          <span>Favoriten</span>
+        </button>
+      </nav>
 
       <PlaygroundModal
         playground={selectedPlayground}
