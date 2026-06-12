@@ -212,9 +212,9 @@ export default function JambinoMVP() {
                 icon={L.icon({
                   iconUrl: '/jambino-pin.svg',
                   
-                  iconSize: [40, 56],
-                  iconAnchor: [20, 56],
-                  popupAnchor: [0, -56],
+                  iconSize: [28, 40],
+                  iconAnchor: [14, 40],
+                  popupAnchor: [0, -40],
                 })}
                 eventHandlers={{
                   click: () => setSelectedPlayground(pg),
