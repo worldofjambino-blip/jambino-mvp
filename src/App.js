@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import JambinoMVP from './components/JambinoMVP';
 import BottomNavigation from './components/BottomNavigation';
+import FavoritesPage from './components/FavoritesPage';
 
 function App() {
   const [activeTab, setActiveTab] = useState('discover');
@@ -16,8 +17,7 @@ function App() {
 
       {activeTab === 'favorites' && (
         <div className="page-content">
-          <h1>❤️ Lieblinge</h1>
-          <p>Hier werden deine Lieblingsspielplätze angezeigt...</p>
+          <FavoritesPage />
         </div>
       )}
 
