@@ -3,6 +3,7 @@ import './App.css';
 import JambinoMVP from './components/JambinoMVP';
 import BottomNavigation from './components/BottomNavigation';
 import FavoritesPage from './components/FavoritesPage';
+import ProfilePage from './components/ProfilePage';
 
 function App() {
   const [activeTab, setActiveTab] = useState('discover');
@@ -23,8 +24,7 @@ function App() {
 
       {activeTab === 'profile' && (
         <div className="page-content">
-          <h1>🦊 Profil</h1>
-          <p>Hier kannst du dein Profil verwalten...</p>
+          <ProfilePage />
         </div>
       )}
 

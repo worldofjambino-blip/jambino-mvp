@@ -1,0 +1,137 @@
+.profile-page {
+  padding: 16px;
+  padding-bottom: 90px; /* Platz für die Bottom-Navigation */
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-page .page-header h1 {
+  color: #f97316;
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+}
+
+.save-toast {
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 12px;
+  padding: 10px 16px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.profile-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.profile-section h2 {
+  font-size: 1.1rem;
+  margin: 0 0 12px 0;
+  color: #444;
+}
+
+.profile-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.profile-input:focus {
+  outline: none;
+  border-color: #f97316;
+}
+
+.age-input {
+  flex: 0 0 80px;
+}
+
+.profile-button {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.profile-button:disabled {
+  background: #fcd9bd;
+  cursor: not-allowed;
+}
+
+.empty-hint {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.children-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.child-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff7ed;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.child-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.child-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.child-age {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.remove-child-button {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.add-child-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
