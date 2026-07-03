@@ -155,22 +155,23 @@ const PlaygroundModal = ({ playground, onClose }) => {
 export default function JambinoMVP() {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   const [activeTab, setActiveTab] = useState('entdecken');
-  const [favorites, setFavorites] = useState([]);
-  const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
-  const [selectedPlayground, setSelectedPlayground] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [favorites, setFavorites] = useState(() => {
+  try {
+    const saved = localStorage.getItem('jambino_favorites');
+    return saved ? JSON.parse(saved) : [];
+  } catch (err) {
+    console.error('Fehler beim Laden der Favoriten:', err);
+    return [];
+  }
+useEffect(() => {
+  fetchSpielplaetze()
+    .then(data => {
+      if (data && data.length > 0) setPlaygrounds(data);
+    })
+    .catch(() => {});
+}, []);
 
-  const toggleFavorite = (id) => {
-    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
-  };
-
-  useEffect(() => {
-    fetchSpielplaetze()
-      .then(data => {
-        if (data && data.length > 0) setPlaygrounds(data);
-      })
-      .catch(() => {});
-  // Favoriten in localStorage speichern
+// Favoriten in localStorage speichern
 useEffect(() => {
   localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
 }, [favorites]);
