@@ -70,6 +70,30 @@ export const MOCK_PLAYGROUNDS = [
 
 const FALLBACK_IMAGE = '/jambino-placeholder.png';
 
+// Zahlenbereiche der Filter-Chips
+const CHIP_RANGES = {
+  '0-3': [0, 3],
+  '3-6': [3, 6],
+  '6-12': [6, 12],
+  '12+': [12, 99],
+};
+
+// Wandelt Altersangaben aus dem Sheet in Zahlenbereiche um,
+// z.B. "Bis 14 Jahre" -> [0,14], "Ab 3 Jahren" -> [3,99], "6-12" -> [6,12]
+const parseAgeRange = (text) => {
+  if (!text) return null;
+  const t = String(text).toLowerCase();
+  const nums = (t.match(/\d+/g) || []).map(Number);
+  if (nums.length === 0) return null;
+  if (t.includes('bis')) return [0, nums[0]];
+  if (t.includes('ab') || t.includes('+')) return [nums[0], 99];
+  if (nums.length >= 2) return [Math.min(...nums), Math.max(...nums)];
+  return [nums[0], nums[0]];
+};
+
+// Prüft, ob sich zwei Bereiche überschneiden
+const rangesOverlap = (a, b) => a[0] <= b[1] && b[0] <= a[1];
+
 // Solange die Bild-Links im Sheet noch nicht gepflegt sind, zeigen wir
 // überall den Platzhalter. Später wieder aktivieren: USE_SHEET_IMAGES = true
 const USE_SHEET_IMAGES = false;
@@ -243,8 +267,15 @@ export default function JambinoMVP() {
         (pg.city && pg.city.toLowerCase().includes(searchTerm.toLowerCase()));
       if (!matchesSearch) return false;
       if (filters.ageGroups.length > 0) {
-        const hasMatchingAge = filters.ageGroups.some(age => pg.ageGroups && pg.ageGroups.includes(age));
-        if (!hasMatchingAge) return false;
+        const selectedRanges = filters.ageGroups.map(a => CHIP_RANGES[a]).filter(Boolean);
+        const pgRanges = (pg.ageGroups || []).map(parseAgeRange).filter(Boolean);
+        // Spielplätze ohne auswertbare Altersangabe bleiben sichtbar
+        if (pgRanges.length > 0) {
+          const matches = selectedRanges.some(sel =>
+            pgRanges.some(pgr => rangesOverlap(sel, pgr))
+          );
+          if (!matches) return false;
+        }
       }
       return true;
     });
