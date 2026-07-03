@@ -155,39 +155,38 @@ const PlaygroundModal = ({ playground, onClose }) => {
 export default function JambinoMVP() {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   const [activeTab, setActiveTab] = useState('entdecken');
+  const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
+  const [selectedPlayground, setSelectedPlayground] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Favoriten: beim ersten Rendern direkt aus localStorage laden
   const [favorites, setFavorites] = useState(() => {
-  try {
-    const saved = localStorage.getItem('jambino_favorites');
-    return saved ? JSON.parse(saved) : [];
-  } catch (err) {
-    console.error('Fehler beim Laden der Favoriten:', err);
-    return [];
-  }
-useEffect(() => {
-  fetchSpielplaetze()
-    .then(data => {
-      if (data && data.length > 0) setPlaygrounds(data);
-    })
-    .catch(() => {});
-}, []);
-
-// Favoriten in localStorage speichern
-useEffect(() => {
-  localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
-}, [favorites]);
-
-// Favoriten beim Start laden
-useEffect(() => {
-  const saved = localStorage.getItem('jambino_favorites');
-  if (saved) {
     try {
-      setFavorites(JSON.parse(saved));
+      const saved = localStorage.getItem('jambino_favorites');
+      return saved ? JSON.parse(saved) : [];
     } catch (err) {
       console.error('Fehler beim Laden der Favoriten:', err);
+      return [];
     }
-  }
-}, []);
-}, []);
+  });
+
+  const toggleFavorite = (id) => {
+    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
+
+  // Spielplätze aus Google Sheets laden (Fallback: Mock-Daten)
+  useEffect(() => {
+    fetchSpielplaetze()
+      .then(data => {
+        if (data && data.length > 0) setPlaygrounds(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Favoriten bei jeder Änderung in localStorage speichern
+  useEffect(() => {
+    localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
   const filteredPlaygrounds = useMemo(() => {
     return playgrounds.filter(pg => {
