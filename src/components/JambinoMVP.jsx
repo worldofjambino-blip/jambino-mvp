@@ -5,7 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './JambinoMVP.css';
 
-const MOCK_PLAYGROUNDS = [
+export const MOCK_PLAYGROUNDS = [
   {
     id: 1,
     name: 'Seeplatz Konstanz',
