@@ -114,6 +114,7 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
           >
             <img
               src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'; }}
               alt={pg.name}
               className="list-item-image"
             />
@@ -127,7 +128,7 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
               {pg.ageGroups && pg.ageGroups.length > 0 && (
                 <div className="age-badges">
                   {pg.ageGroups.map(age => (
-                    <span key={age} className="age-badge">{age} J.</span>
+                    <span key={age} className="age-badge">{age}</span>
                   ))}
                 </div>
               )}
@@ -154,6 +155,7 @@ const PlaygroundModal = ({ playground, onClose }) => {
         <button className="modal-close" onClick={onClose}>✕</button>
         <img
           src={playground.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'; }}
           alt={playground.name}
           className="modal-image"
         />
@@ -169,7 +171,7 @@ const PlaygroundModal = ({ playground, onClose }) => {
           {playground.ageGroups && playground.ageGroups.length > 0 && (
             <div className="age-badges modal-badges">
               {playground.ageGroups.map(age => (
-                <span key={age} className="age-badge">{age} Jahre</span>
+                <span key={age} className="age-badge">{age}</span>
               ))}
             </div>
           )}
