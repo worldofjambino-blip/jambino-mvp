@@ -98,3 +98,11 @@
 .remove-favorite-button:hover {
   background: var(--jambino-pink-soft);
 }
+/* Desktop: Illustration in Originalproportion, nicht reingezoomt */
+@media (min-width: 769px) {
+  .favorites-page {
+    background-size: auto 100vh;
+    background-position: center bottom;
+    background-attachment: fixed;
+  }
+}

@@ -157,3 +157,11 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+/* Desktop: Illustration in Originalproportion, nicht reingezoomt */
+@media (min-width: 769px) {
+  .profile-page {
+    background-size: auto 100vh;
+    background-position: center bottom;
+    background-attachment: fixed;
+  }
+}
