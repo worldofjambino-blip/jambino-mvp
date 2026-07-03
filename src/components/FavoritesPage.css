@@ -1,117 +1,100 @@
+/* ❤️ Lieblinge-Seite – mit Jambino-Hintergrund */
+
 .favorites-page {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-bottom: 100px;
+  min-height: 100vh;
+  padding: 16px;
+  padding-bottom: 110px; /* Platz für Bottom-Nav + Spielplatz-Illustration */
+  background-image: url('/jambino-background.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
 }
 
-.page-header {
-  margin-bottom: 30px;
+.favorites-page .page-header,
+.favorites-page .favorites-list,
+.favorites-page .empty-state {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.favorites-page .page-header h1 {
+  color: var(--jambino-orange);
   text-align: center;
-}
-
-.page-header h1 {
-  color: #FF8C42;
-  font-size: 28px;
-  margin: 0;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
 }
 
 .empty-state {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
   text-align: center;
-  padding: 60px 20px;
-  color: #999;
+  color: var(--text-medium);
+  box-shadow: var(--shadow-soft);
 }
 
-.empty-state p {
-  font-size: 16px;
-  margin: 10px 0;
+.empty-state p:first-child {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
 }
 
 .favorites-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.favorite-item {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.favorite-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.favorite-item img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.favorite-info {
-  padding: 16px;
-}
-
-.favorite-info h3 {
-  margin: 0 0 8px 0;
-  color: #333;
-  font-size: 18px;
-}
-
-.favorite-info .city {
-  color: #FF8C42;
-  margin: 4px 0;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.favorite-info .description {
-  color: #666;
-  margin: 8px 0;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.favorite-actions {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.favorite-card {
+  display: flex;
   align-items: center;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.rating {
-  font-size: 14px;
-  color: #FFB800;
-  font-weight: 500;
+.favorite-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
 }
 
-.remove-btn {
-  background: none;
-  border: none;
-  color: #FF8C42;
+.favorite-info h2 {
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  margin: 0 0 2px 0;
+}
+
+.favorite-location {
+  font-size: 0.85rem;
+  color: var(--text-medium);
+  margin: 0 0 4px 0;
+}
+
+.favorite-info p {
+  font-size: 0.85rem;
+  color: var(--text-medium);
+  margin: 0;
+}
+
+.remove-favorite-button {
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--jambino-pink);
+  border: 1px solid var(--jambino-pink-soft);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+  transition: background 0.15s ease;
 }
 
-.remove-btn:hover {
-  background-color: #fff0e6;
-}
-
-@media (max-width: 768px) {
-  .favorites-list {
-    grid-template-columns: 1fr;
-  }
-  
-  .favorites-page {
-    padding: 12px;
-  }
+.remove-favorite-button:hover {
+  background: var(--jambino-pink-soft);
 }

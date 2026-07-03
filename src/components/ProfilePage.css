@@ -1,21 +1,34 @@
+/* 🦊 Profil-Seite – mit Jambino-Hintergrund */
+
 .profile-page {
+  min-height: 100vh;
   padding: 16px;
-  padding-bottom: 90px; /* Platz für die Bottom-Navigation */
+  padding-bottom: 110px; /* Platz für Bottom-Nav + Spielplatz-Illustration */
+  background-image: url('/jambino-background.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.profile-page .page-header,
+.profile-page .save-toast,
+.profile-page .profile-section {
   max-width: 600px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .profile-page .page-header h1 {
-  color: #f97316;
+  color: var(--jambino-orange);
   text-align: center;
   font-size: 1.6rem;
   margin-bottom: 20px;
 }
 
 .save-toast {
-  background: #dcfce7;
+  background: var(--jambino-green-soft);
   color: #166534;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 10px 16px;
   text-align: center;
   font-weight: 600;
@@ -23,23 +36,23 @@
 }
 
 .profile-section {
-  background: #fff;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius-lg);
   padding: 16px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-soft);
 }
 
 .profile-section h2 {
   font-size: 1.1rem;
   margin: 0 0 12px 0;
-  color: #444;
+  color: var(--text-dark);
 }
 
 .profile-label {
   display: block;
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-medium);
   margin-bottom: 6px;
 }
 
@@ -51,15 +64,17 @@
 .profile-input {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  padding: 10px 14px;
+  border: 2px solid var(--jambino-orange-soft);
+  border-radius: var(--radius-pill);
   font-size: 1rem;
+  background: var(--jambino-white);
+  color: var(--text-dark);
 }
 
 .profile-input:focus {
   outline: none;
-  border-color: #f97316;
+  border-color: var(--jambino-orange);
 }
 
 .age-input {
@@ -67,24 +82,31 @@
 }
 
 .profile-button {
-  background: #f97316;
-  color: #fff;
+  background: var(--jambino-orange);
+  color: var(--jambino-white);
   border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+
+.profile-button:hover {
+  transform: translateY(-2px);
 }
 
 .profile-button:disabled {
-  background: #fcd9bd;
+  background: var(--jambino-orange-soft);
+  color: var(--text-light);
   cursor: not-allowed;
+  transform: none;
 }
 
 .empty-hint {
-  color: #999;
+  color: var(--text-medium);
   font-size: 0.9rem;
   margin-bottom: 12px;
 }
@@ -100,8 +122,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff7ed;
-  border-radius: 12px;
+  background: var(--jambino-cream);
+  border-radius: var(--radius-md);
   padding: 10px 14px;
 }
 
@@ -111,20 +133,20 @@
 }
 
 .child-name {
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: var(--text-dark);
 }
 
 .child-age {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-medium);
 }
 
 .remove-child-button {
   background: transparent;
-  color: #ef4444;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
+  color: var(--jambino-pink);
+  border: 1px solid var(--jambino-pink-soft);
+  border-radius: var(--radius-sm);
   padding: 6px 12px;
   font-size: 0.85rem;
   cursor: pointer;
