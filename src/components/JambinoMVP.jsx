@@ -170,7 +170,23 @@ export default function JambinoMVP() {
         if (data && data.length > 0) setPlaygrounds(data);
       })
       .catch(() => {});
-  }, []);
+  // Favoriten in localStorage speichern
+useEffect(() => {
+  localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
+}, [favorites]);
+
+// Favoriten beim Start laden
+useEffect(() => {
+  const saved = localStorage.getItem('jambino_favorites');
+  if (saved) {
+    try {
+      setFavorites(JSON.parse(saved));
+    } catch (err) {
+      console.error('Fehler beim Laden der Favoriten:', err);
+    }
+  }
+}, []);
+}, []);
 
   const filteredPlaygrounds = useMemo(() => {
     return playgrounds.filter(pg => {
