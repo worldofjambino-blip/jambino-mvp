@@ -1,4 +1,12 @@
-/* ============================================
+.jambino-app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaflet-map {
+  z-index: 10 !important;
+}/* ============================================
    JAMBINO - Comic-Style CSS
    Orange (#FF8C42) + Green (#2ECC71)
    ============================================ */

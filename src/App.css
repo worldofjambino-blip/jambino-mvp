@@ -1,40 +1,12 @@
-import React, { useState } from 'react';
-import './App.css';
-import JambinoMVP from './components/JambinoMVP';
-import BottomNavigation from './components/BottomNavigation';
-
-function App() {
-  const [activeTab, setActiveTab] = useState('discover');
-
-  return (
-    <div className="app-container">
-      {/* Discover Tab - Karte */}
-      {activeTab === 'discover' && (
-        <div className="page-content">
-          <JambinoMVP />
-        </div>
-      )}
-
-      {/* Favorites Tab */}
-      {activeTab === 'favorites' && (
-        <div className="page-content">
-          <h1>❤️ Lieblinge</h1>
-          <p>Hier werden deine Lieblingsspielplätze angezeigt...</p>
-        </div>
-      )}
-
-      {/* Profile Tab */}
-      {activeTab === 'profile' && (
-        <div className="page-content">
-          <h1>🦊 Profil</h1>
-          <p>Hier kannst du dein Profil verwalten...</p>
-        </div>
-      )}
-
-      {/* Bottom Navigation */}
-      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-    </div>
-  );
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
-export default App;
+.page-content {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 80px;
+}
