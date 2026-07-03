@@ -4,7 +4,7 @@
   min-height: 100vh;
   padding: 16px;
   padding-bottom: 110px; /* Platz für Bottom-Nav + Spielplatz-Illustration */
-  background-image: url('/jambino-background.jpg');
+  background-image: url('../assets/jambino-background.jpg');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
