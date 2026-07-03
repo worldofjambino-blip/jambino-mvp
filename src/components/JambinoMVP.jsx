@@ -68,6 +68,26 @@ export const MOCK_PLAYGROUNDS = [
   },
 ];
 
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600';
+
+const SafeImage = ({ src, alt, className }) => {
+  const [imgSrc, setImgSrc] = useState(src && src.startsWith('http') ? src : FALLBACK_IMAGE);
+
+  useEffect(() => {
+    setImgSrc(src && src.startsWith('http') ? src : FALLBACK_IMAGE);
+  }, [src]);
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={() => setImgSrc(FALLBACK_IMAGE)}
+    />
+  );
+};
+
 const FilterPanel = ({ filters, onFilterChange }) => {
   return (
     <div className="filter-panel">
@@ -112,9 +132,8 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
             className="list-item"
             onClick={() => onSelectPlayground(pg)}
           >
-            <img
-              src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
-              onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'; }}
+            <SafeImage
+              src={pg.coverImage}
               alt={pg.name}
               className="list-item-image"
             />
@@ -153,9 +172,8 @@ const PlaygroundModal = ({ playground, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
-        <img
-          src={playground.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
-          onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'; }}
+        <SafeImage
+          src={playground.coverImage}
           alt={playground.name}
           className="modal-image"
         />
