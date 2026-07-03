@@ -68,13 +68,18 @@ export const MOCK_PLAYGROUNDS = [
   },
 ];
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600';
+const FALLBACK_IMAGE = '/jambino-placeholder.png';
+
+// Solange die Bild-Links im Sheet noch nicht gepflegt sind, zeigen wir
+// überall den Platzhalter. Später wieder aktivieren: USE_SHEET_IMAGES = true
+const USE_SHEET_IMAGES = false;
 
 const SafeImage = ({ src, alt, className }) => {
-  const [imgSrc, setImgSrc] = useState(src && src.startsWith('http') ? src : FALLBACK_IMAGE);
+  const initial = USE_SHEET_IMAGES && src && src.startsWith('http') ? src : FALLBACK_IMAGE;
+  const [imgSrc, setImgSrc] = useState(initial);
 
   useEffect(() => {
-    setImgSrc(src && src.startsWith('http') ? src : FALLBACK_IMAGE);
+    setImgSrc(USE_SHEET_IMAGES && src && src.startsWith('http') ? src : FALLBACK_IMAGE);
   }, [src]);
 
   return (

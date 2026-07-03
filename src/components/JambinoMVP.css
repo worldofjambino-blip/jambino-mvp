@@ -1,4 +1,4 @@
-/* ============================================
+* ============================================
    🎪 JAMBINO MVP – Entdecken-Tab
    Nutzt die Variablen aus src/theme.css
    ============================================ */
@@ -226,7 +226,9 @@
   width: 84px;
   height: 84px;
   border-radius: var(--radius-md);
-  object-fit: cover;
+  object-fit: contain;
+  background: var(--jambino-orange-soft);
+  padding: 10px;
 }
 
 .list-item-title {
