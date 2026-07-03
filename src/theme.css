@@ -1,0 +1,76 @@
+/* ============================================
+   🎪 JAMBINO DESIGN-SYSTEM
+   Zentrale Farben, Schriften & Abstände.
+   Alle Seiten bedienen sich aus diesen Variablen.
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  /* --- Farben --- */
+  --jambino-orange: #F97316;
+  --jambino-orange-dark: #EA580C;
+  --jambino-orange-soft: #FFEDD5;
+
+  --jambino-cream: #FFF6EA;
+  --jambino-white: #FFFFFF;
+
+  --jambino-brown: #4A3B2A;
+  --jambino-brown-dark: #362B1E;
+
+  --jambino-pink: #F43F5E;
+  --jambino-pink-soft: #FFE4E6;
+
+  --jambino-green: #22C55E;
+  --jambino-green-soft: #DCFCE7;
+
+  /* --- Textfarben --- */
+  --text-dark: #3D2E1E;
+  --text-medium: #6B5D4D;
+  --text-light: #9C8F7F;
+
+  /* --- Schriften --- */
+  --font-display: 'Baloo 2', cursive;
+  --font-body: 'Nunito', sans-serif;
+
+  /* --- Abstände --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+
+  /* --- Rundungen --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* --- Schatten --- */
+  --shadow-soft: 0 2px 8px rgba(74, 59, 42, 0.08);
+  --shadow-card: 0 4px 14px rgba(74, 59, 42, 0.10);
+  --shadow-lifted: 0 8px 24px rgba(74, 59, 42, 0.14);
+}
+
+/* --- Globale Grundeinstellungen --- */
+body {
+  margin: 0;
+  background: var(--jambino-cream);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--text-dark);
+  letter-spacing: 0.2px;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+}
