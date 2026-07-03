@@ -71,9 +71,9 @@ export const MOCK_PLAYGROUNDS = [
 const FilterPanel = ({ filters, onFilterChange }) => {
   return (
     <div className="filter-panel">
-      <h3 className="filter-title">🎪 Filter</h3>
+      <h3 className="filter-title">Filter</h3>
       <div className="filter-section">
-        <label className="section-title">📍 Altersgruppen</label>
+        <label className="section-title">Altersgruppen</label>
         <div className="filter-buttons">
           {['0-3', '3-6', '6-12', '12+'].map(age => (
             <button
@@ -104,7 +104,7 @@ const FilterPanel = ({ filters, onFilterChange }) => {
 const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFavorite }) => {
   return (
     <div className="list-container">
-      <h3 className="list-title">📍 Spielplätze ({playgrounds.length})</h3>
+      <h3 className="list-title">In deiner Nähe ({playgrounds.length})</h3>
       <div className="list">
         {playgrounds.map(pg => (
           <div
@@ -112,16 +112,28 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
             className="list-item"
             onClick={() => onSelectPlayground(pg)}
           >
-            <img src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={pg.name} className="list-item-image" />
+            <img
+              src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
+              alt={pg.name}
+              className="list-item-image"
+            />
             <div className="list-item-content">
               <h4 className="list-item-title">{pg.name}</h4>
-              <p className="list-item-location">{pg.city}</p>
+              {pg.city && <p className="list-item-location">📍 {pg.city}</p>}
               <div className="list-item-rating">
-                <span>{'⭐'.repeat(Math.floor(pg.rating || 4))}</span>
+                <span className="stars">{'⭐'.repeat(Math.round(pg.rating || 4))}</span>
+                {pg.rating && <span className="rating-value">{pg.rating}</span>}
               </div>
+              {pg.ageGroups && pg.ageGroups.length > 0 && (
+                <div className="age-badges">
+                  {pg.ageGroups.map(age => (
+                    <span key={age} className="age-badge">{age} J.</span>
+                  ))}
+                </div>
+              )}
             </div>
             <button
-              className="favorite-btn"
+              className={`favorite-btn ${favorites.includes(pg.id) ? 'is-favorite' : ''}`}
               onClick={(e) => { e.stopPropagation(); onToggleFavorite(pg.id); }}
               aria-label="Favorit umschalten"
             >
@@ -140,12 +152,27 @@ const PlaygroundModal = ({ playground, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
-        <img src={playground.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={playground.name} className="modal-image" />
+        <img
+          src={playground.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'}
+          alt={playground.name}
+          className="modal-image"
+        />
         <div className="modal-body">
           <h2 className="modal-title">{playground.name}</h2>
-          <p className="modal-description">{playground.description}</p>
-          <p className="modal-location">📍 {playground.city}</p>
-          <div className="modal-rating">⭐ {playground.rating} ({playground.reviews} Bewertungen)</div>
+          {playground.description && <p className="modal-description">{playground.description}</p>}
+          {playground.city && <p className="modal-location">📍 {playground.city}</p>}
+          {playground.rating && (
+            <div className="modal-rating">
+              ⭐ {playground.rating}{playground.reviews ? ` (${playground.reviews} Bewertungen)` : ''}
+            </div>
+          )}
+          {playground.ageGroups && playground.ageGroups.length > 0 && (
+            <div className="age-badges modal-badges">
+              {playground.ageGroups.map(age => (
+                <span key={age} className="age-badge">{age} Jahre</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -154,12 +181,10 @@ const PlaygroundModal = ({ playground, onClose }) => {
 
 export default function JambinoMVP() {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
-  const [activeTab, setActiveTab] = useState('entdecken');
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Favoriten: beim ersten Rendern direkt aus localStorage laden
   const [favorites, setFavorites] = useState(() => {
     try {
       const saved = localStorage.getItem('jambino_favorites');
@@ -174,7 +199,6 @@ export default function JambinoMVP() {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
 
-  // Spielplätze aus Google Sheets laden (Fallback: Mock-Daten)
   useEffect(() => {
     fetchSpielplaetze()
       .then(data => {
@@ -183,7 +207,6 @@ export default function JambinoMVP() {
       .catch(() => {});
   }, []);
 
-  // Favoriten bei jeder Änderung in localStorage speichern
   useEffect(() => {
     localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -202,123 +225,66 @@ export default function JambinoMVP() {
     });
   }, [filters, searchTerm, playgrounds]);
 
-  const favoritePlaygrounds = useMemo(() => {
-    return playgrounds.filter(pg => favorites.includes(pg.id));
-  }, [playgrounds, favorites]);
-
   return (
     <div className="jambino-app">
       <header className="app-header">
-        <h1 className="app-title">🎪 Jambino</h1>
-        <p className="app-subtitle">Spielplätze am Bodensee</p>
+        <img src="/jambino-logo.png" alt="Jambino Fuchs" className="app-logo" />
+        <div className="header-text">
+          <h1 className="app-title">Jambino</h1>
+          <p className="app-subtitle">Dein Spielplatz-Kompass</p>
+        </div>
       </header>
 
       <div className="search-container">
         <input
           type="text"
-          placeholder="🔍 Spielplatz suchen..."
+          placeholder="🔍 Finde deinen nächsten Lieblingsspielplatz..."
           className="search-input"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      {activeTab === 'entdecken' && (
-        <div className="main-layout">
-          <div className="sidebar">
-            <FilterPanel filters={filters} onFilterChange={setFilters} />
-            <PlaygroundList
-              playgrounds={filteredPlaygrounds}
-              onSelectPlayground={setSelectedPlayground}
-              favorites={favorites}
-              onToggleFavorite={toggleFavorite}
+      <div className="main-layout">
+        <div className="sidebar">
+          <FilterPanel filters={filters} onFilterChange={setFilters} />
+          <PlaygroundList
+            playgrounds={filteredPlaygrounds}
+            onSelectPlayground={setSelectedPlayground}
+            favorites={favorites}
+            onToggleFavorite={toggleFavorite}
+          />
+        </div>
+
+        <div className="map-container">
+          <MapContainer center={[47.75, 8.95]} zoom={9} className="leaflet-map">
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; OpenStreetMap'
             />
-          </div>
-
-          <div className="map-container">
-            <MapContainer center={[47.75, 8.95]} zoom={9} className="leaflet-map">
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; OpenStreetMap'
-              />
-              {filteredPlaygrounds.map(pg => (
-                <Marker
-                  key={pg.id}
-                  position={[pg.latitude, pg.longitude]}
-                  icon={L.icon({
-                    iconUrl: '/jambino-pin.svg',
-                    iconSize: [28, 40],
-                    iconAnchor: [14, 40],
-                    popupAnchor: [0, -40],
-                  })}
-                  eventHandlers={{
-                    click: () => setSelectedPlayground(pg),
-                  }}
-                >
-                  <Popup>
-                    <h3>{pg.name}</h3>
-                    <p>{pg.city}</p>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
-          </div>
+            {filteredPlaygrounds.map(pg => (
+              <Marker
+                key={pg.id}
+                position={[pg.latitude, pg.longitude]}
+                icon={L.icon({
+                  iconUrl: '/jambino-pin.svg',
+                  iconSize: [28, 40],
+                  iconAnchor: [14, 40],
+                  popupAnchor: [0, -40],
+                })}
+                eventHandlers={{
+                  click: () => setSelectedPlayground(pg),
+                }}
+              >
+                <Popup>
+                  <h3>{pg.name}</h3>
+                  <p>{pg.city}</p>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
-      )}
-
-      {activeTab === 'favoriten' && (
-        <div className="main-layout">
-          <div className="sidebar" style={{ width: '100%' }}>
-            <div className="list-container">
-              <h3 className="list-title">❤️ Favoriten ({favoritePlaygrounds.length})</h3>
-              {favoritePlaygrounds.length === 0 ? (
-                <p style={{ padding: 'var(--spacing-md) 0', color: 'var(--text-light)' }}>
-                  Noch keine Favoriten gespeichert. Tippe auf das Herz bei einem Spielplatz!
-                </p>
-              ) : (
-                <div className="list">
-                  {favoritePlaygrounds.map(pg => (
-                    <div key={pg.id} className="list-item" onClick={() => setSelectedPlayground(pg)}>
-                      <img src={pg.coverImage || 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600'} alt={pg.name} className="list-item-image" />
-                      <div className="list-item-content">
-                        <h4 className="list-item-title">{pg.name}</h4>
-                        <p className="list-item-location">{pg.city}</p>
-                        <div className="list-item-rating">
-                          <span>{'⭐'.repeat(Math.floor(pg.rating || 4))}</span>
-                        </div>
-                      </div>
-                      <button
-                        className="favorite-btn"
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(pg.id); }}
-                        aria-label="Favorit entfernen"
-                      >
-                        ❤️
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <nav className="bottom-nav">
-        <button
-          className={`bottom-nav-item ${activeTab === 'entdecken' ? 'active' : ''}`}
-          onClick={() => setActiveTab('entdecken')}
-        >
-          <span className="bottom-nav-icon">📍</span>
-          <span>Entdecken</span>
-        </button>
-        <button
-          className={`bottom-nav-item ${activeTab === 'favoriten' ? 'active' : ''}`}
-          onClick={() => setActiveTab('favoriten')}
-        >
-          <span className="bottom-nav-icon">❤️</span>
-          <span>Favoriten</span>
-        </button>
-      </nav>
+      </div>
 
       <PlaygroundModal
         playground={selectedPlayground}
