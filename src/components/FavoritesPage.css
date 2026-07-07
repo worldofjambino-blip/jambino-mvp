@@ -98,11 +98,13 @@
 .remove-favorite-button:hover {
   background: var(--jambino-pink-soft);
 }
-/* Desktop: Illustration in Originalproportion, nicht reingezoomt */
+
+/* Desktop: eigenes Breitbild-Hintergrundbild */
 @media (min-width: 769px) {
   .favorites-page {
-    background-size: auto 100vh;
-    background-position: center bottom;
+    background-image: url('../assets/jambino-background-desktop.jpg');
+    background-size: cover;
+    background-position: center;
     background-attachment: fixed;
   }
 }
