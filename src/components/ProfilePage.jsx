@@ -13,49 +13,6 @@ function normalizePerson(p) {
     id: p.id != null ? p.id : Date.now() + Math.floor(Math.random() * 100000),
     name: p.name || '',
     age: p.age != null ? String(p.age) : '',
-    gender: p.gender === 'maennlich' ? 'maennlich' : 'weiblich',
-    active: p.active !== false,
-  };
-}
-
-function migrateProfile(raw) {
-  if (!raw || typeof raw !== 'object') return EMPTY_PROFILE;
-  if (Array.isArray(raw.adults)) {
-    return {
-      adults: raw.adults.map(normalizePerson),
-      children: Array.isArray(raw.children) ? raw.children.map(normalizePerson) : [],
-    };
-  }
-  const adults = raw.parentName
-    ? [normalizePerson({ name: raw.parentName, gender: 'weiblich', active: true })]
-    : [];
-  const children = Array.isArray(raw.children)
-    ? raw.children.map((c) => normalizePerson({ ...c, active: true }))
-    : [];
-  return { adults, children };
-}
-
-function avatarFor(person, kind) {
-  if (kind === 'adult') {
-    return person.gender === 'maennlich' ? fuchsPapa : fuchsMama;
-  }
-  return person.gender === 'maennlich' ? fuchsJunge :
-cat > src/components/ProfilePage.jsx << 'EOF'
-import React, { useState } from 'react';
-import './ProfilePage.css';
-import fuchsMama from '../assets/Jambino_Fuchsmama.png';
-import fuchsPapa from '../assets/Jambino_Fuchspapa.png';
-import fuchsJunge from '../assets/Jambino_Fuchsjunge.png';
-import fuchsMaedchen from '../assets/Jambino_Fuchsmaedchen.png';
-
-const EMPTY_PROFILE = { adults: [], children: [] };
-const STORAGE_KEY = 'jambino_profile';
-
-function normalizePerson(p) {
-  return {
-    id: p.id != null ? p.id : Date.now() + Math.floor(Math.random() * 100000),
-    name: p.name || '',
-    age: p.age != null ? String(p.age) : '',
     gender: p.gender === 'maennlich' ? 'maennlich' : p.gender === 'divers' ? 'divers' : 'weiblich',
     active: p.active !== false,
   };
