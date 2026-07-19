@@ -4,6 +4,7 @@ import fuchsMama from '../assets/Jambino_Fuchsmama.png';
 import fuchsPapa from '../assets/Jambino_Fuchspapa.png';
 import fuchsJunge from '../assets/Jambino_Fuchsjunge.png';
 import fuchsMaedchen from '../assets/Jambino_Fuchsmaedchen.png';
+import fuchsDivers from '../assets/Jambino_Fuchsdivers.png';
 
 const EMPTY_PROFILE = { adults: [], children: [] };
 const STORAGE_KEY = 'jambino_profile';
@@ -36,7 +37,7 @@ function migrateProfile(raw) {
 }
 
 function avatarSrc(person, kind) {
-  if (person.gender === 'divers') return null;
+  if (person.gender === 'divers') return fuchsDivers;
   if (kind === 'adult') {
     return person.gender === 'maennlich' ? fuchsPapa : fuchsMama;
   }
