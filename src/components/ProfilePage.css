@@ -1,9 +1,9 @@
-/* 🦊 Profil-Seite – mit Jambino-Hintergrund */
+/* 🦊 Profil-Seite – mit Jambino-Hintergrund*/
 
 .profile-page {
   min-height: 100vh;
   padding: 16px;
-  padding-bottom: 110px; /* Platz für Bottom-Nav + Spielplatz-Illustration */
+  padding-bottom: 110px;
   background-image: url('../assets/jambino-background.jpg');
   background-size: cover;
   background-position: center bottom;
@@ -56,13 +56,8 @@
   margin-bottom: 6px;
 }
 
-.input-row {
-  display: flex;
-  gap: 8px;
-}
-
 .profile-input {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   padding: 10px 14px;
   border: 2px solid var(--jambino-orange-soft);
@@ -77,8 +72,20 @@
   border-color: var(--jambino-orange);
 }
 
-.age-input {
-  flex: 0 0 80px;
+.profile-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--jambino-orange-soft);
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
+  background: var(--jambino-white);
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.profile-select:focus {
+  outline: none;
+  border-color: var(--jambino-orange);
 }
 
 .profile-button {
@@ -111,51 +118,222 @@
   margin-bottom: 12px;
 }
 
-.children-list {
+/* Eingabe-Zeile für Personen */
+.person-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field .profile-label {
+  margin-bottom: 0;
+}
+
+.field-name {
+  flex: 1 1 150px;
+}
+
+.field-age {
+  flex: 0 0 70px;
+}
+
+.field-gender {
+  flex: 0 0 140px;
+}
+
+.person-form .profile-button {
+  flex: 0 0 auto;
+}
+
+/* Personen-Karten */
+.person-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-top: 4px;
 }
 
-.child-card {
+.person-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   background: var(--jambino-cream);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
+  padding: 8px 12px;
 }
 
-.child-info {
+.person-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--jambino-white);
+  flex: 0 0 auto;
+}
+
+.person-name {
+  font-weight: 700;
+  color: var(--text-dark);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-age {
+  color: var(--text-medium);
+  font-size: 0.9rem;
+  flex: 0 0 auto;
+}
+
+.person-gender {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  flex: 0 0 auto;
+}
+
+.person-gender .gender-symbol {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.person-gender.weiblich .gender-symbol {
+  color: var(--jambino-pink);
+}
+
+.person-gender.maennlich .gender-symbol {
+  color: #3b82f6;
+}
+
+.person-gender.divers .gender-symbol {
+  color: #9333ea;
+}
+
+.person-check {
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+.person-check input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--jambino-orange);
+}
+
+.person-remove {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.person-remove:hover {
+  color: var(--jambino-pink);
+}
+
+/* Zusammenfassung */
+.profile-summary h2 {
+  color: var(--jambino-orange);
+}
+
+.summary-hint {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.summary-row.weiblich {
+  background: var(--jambino-pink-soft);
+}
+
+.summary-row.maennlich {
+  background: #e0f0ff;
+}
+
+.summary-row.divers {
+  background: #f3e8ff;
+}
+
+.summary-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--jambino-white);
+  flex: 0 0 auto;
+}
+
+/* Platzhalter-Avatar (z.B. für „divers", solange kein eigener Fuchs hinterlegt ist) */
+.avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #9333ea;
+  background: #f3e8ff;
+}
+
+.summary-avatar.avatar-placeholder {
+  font-size: 1.15rem;
+}
+
+.summary-info {
   display: flex;
   flex-direction: column;
 }
 
-.child-name {
+.summary-name {
   font-weight: 700;
   color: var(--text-dark);
 }
 
-.child-age {
+.summary-sub {
   font-size: 0.85rem;
   color: var(--text-medium);
 }
 
-.remove-child-button {
-  background: transparent;
-  color: var(--jambino-pink);
-  border: 1px solid var(--jambino-pink-soft);
-  border-radius: var(--radius-sm);
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  cursor: pointer;
+.summary-divider {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 8px 0;
+  font-size: 0.95rem;
 }
 
-.add-child-form {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+/* Auf kleinen Handys das Geschlechts-Wort ausblenden (Symbol bleibt) */
+@media (max-width: 480px) {
+  .person-gender .gender-word {
+    display: none;
+  }
 }
 
 /* Desktop: eigenes Breitbild-Hintergrundbild */
