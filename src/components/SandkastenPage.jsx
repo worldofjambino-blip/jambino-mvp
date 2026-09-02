@@ -9,6 +9,7 @@ const INITIAL_UPDATES = [
     id: 1,
     playgroundId: 1,
     playgroundName: 'Ettenbergstrasse',
+    playgroundOrt: 'Schaffhausen',
     author: 'Mama_Mia',
     time: 'Heute, 10:32',
     text: 'Der Spielplatz an der Ettenbergstrasse ist heute ziemlich voll 😅',
@@ -24,6 +25,7 @@ const INITIAL_UPDATES = [
     id: 2,
     playgroundId: 2,
     playgroundName: 'Schulstrasse 5',
+    playgroundOrt: 'Schaffhausen',
     author: 'Papa_Bear',
     time: 'Heute, 09:15',
     text: 'Die Schaukel wurde repariert! Danke an alle fleißigen Helfer 🙌',
@@ -41,6 +43,7 @@ const INITIAL_DATES = [
     id: 101,
     playgroundId: 3,
     playgroundName: 'Rheinuferpark',
+    playgroundOrt: 'Schaffhausen',
     author: 'Kita_Sonnenschein',
     time: 'Gestern, 16:45',
     text: 'Wir planen ein Spielfest nächsten Samstag um 15 Uhr. Wer kommt mit? 📍',
@@ -265,10 +268,12 @@ export default function SandkastenPage() {
     const text = draft.trim();
     if (!text || !draftPlaygroundId) return;
     const pg = playgrounds.find((p) => String(p.id) === String(draftPlaygroundId));
+    const ort = pg ? (pg.city || pg.untergemeinde || '') : '';
     const newPost = {
       id: Date.now(),
       playgroundId: draftPlaygroundId,
       playgroundName: pg ? pg.name : 'Unbekannter Spielplatz',
+      playgroundOrt: ort,
       author: 'Du',
       time: 'gerade eben',
       text,
@@ -318,7 +323,11 @@ export default function SandkastenPage() {
                 </div>
                 {p.tag && <span className={`sk-tag ${p.tagType}`}>{p.tag}</span>}
               </div>
-              {p.playgroundName && <div className="sk-post-place">📍 {p.playgroundName}</div>}
+              {p.playgroundName && (
+                <div className="sk-post-place">
+                  📍 {p.playgroundName}{p.playgroundOrt ? ', ' + p.playgroundOrt : ''}
+                </div>
+              )}
               <p className="sk-text">{p.text}</p>
               <div className="sk-post-foot">
                 <button
