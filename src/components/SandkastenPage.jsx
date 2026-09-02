@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchSpielplaetze } from '../api/googleSheets';
+import { MOCK_PLAYGROUNDS } from './JambinoMVP';
 import bgMobile from '../assets/jambino-background.jpg';
 import bgDesktop from '../assets/jambino-background-desktop.jpg';
 
 const INITIAL_UPDATES = [
   {
     id: 1,
+    playgroundId: 1,
+    playgroundName: 'Ettenbergstrasse',
     author: 'Mama_Mia',
     time: 'Heute, 10:32',
     text: 'Der Spielplatz an der Ettenbergstrasse ist heute ziemlich voll 😅',
@@ -14,11 +18,12 @@ const INITIAL_UPDATES = [
     comments: [
       { id: 11, author: 'Papa_Bear', text: 'Danke für die Info! Dann gehen wir später.' },
       { id: 12, author: 'Lena_M', text: 'Bei uns war es heute Morgen noch ruhig.' },
-      { id: 13, author: 'Tom', text: 'Gibt es dort Schatten?' },
     ],
   },
   {
     id: 2,
+    playgroundId: 2,
+    playgroundName: 'Schulstrasse 5',
     author: 'Papa_Bear',
     time: 'Heute, 09:15',
     text: 'Die Schaukel wurde repariert! Danke an alle fleißigen Helfer 🙌',
@@ -27,7 +32,6 @@ const INITIAL_UPDATES = [
     likes: 8,
     comments: [
       { id: 21, author: 'Mama_Mia', text: 'Super, endlich! 🎉' },
-      { id: 22, author: 'Sandra', text: 'Wer war der Held? 😄' },
     ],
   },
 ];
@@ -35,9 +39,11 @@ const INITIAL_UPDATES = [
 const INITIAL_DATES = [
   {
     id: 101,
+    playgroundId: 3,
+    playgroundName: 'Rheinuferpark',
     author: 'Kita_Sonnenschein',
     time: 'Gestern, 16:45',
-    text: 'Wir planen ein Spielfest nächsten Samstag um 15 Uhr im Stadtpark. Wer kommt mit? 📍',
+    text: 'Wir planen ein Spielfest nächsten Samstag um 15 Uhr. Wer kommt mit? 📍',
     tag: 'Treffen',
     tagType: 'treffen',
     likes: 15,
@@ -87,7 +93,7 @@ const SK_STYLES = `
     padding: 14px 16px;
     box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.1));
   }
-  .sk-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .sk-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
   .sk-avatar {
     width: 38px; height: 38px; border-radius: 50%;
     background: var(--jambino-cream, #fff7ed);
@@ -100,6 +106,7 @@ const SK_STYLES = `
   .sk-tag.voll { background: #fee2e2; color: #b91c1c; }
   .sk-tag.info { background: #dbeafe; color: #1d4ed8; }
   .sk-tag.treffen { background: #ede9fe; color: #6d28d9; }
+  .sk-post-place { font-size: 0.8rem; color: var(--jambino-orange, #f97316); font-weight: 600; margin: 0 0 8px 0; }
   .sk-text { color: var(--text-dark, #222); margin: 0 0 10px 0; line-height: 1.4; }
   .sk-post-foot { display: flex; gap: 16px; align-items: center; }
   .sk-action {
@@ -154,6 +161,13 @@ const SK_STYLES = `
     background: rgba(255, 255, 255, 0.96); border-radius: var(--radius-lg, 16px);
     padding: 12px; box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.1));
   }
+  .sk-select {
+    width: 100%; box-sizing: border-box;
+    border: 2px solid var(--jambino-orange-soft, #fed7aa); border-radius: var(--radius-md, 12px);
+    padding: 10px 12px; font-size: 1rem; font-family: inherit; color: var(--text-dark, #222);
+    background: #fff; margin-bottom: 8px; cursor: pointer;
+  }
+  .sk-select:focus { outline: none; border-color: var(--jambino-orange, #f97316); }
   .sk-textarea {
     width: 100%; box-sizing: border-box; resize: vertical;
     border: 2px solid var(--jambino-orange-soft, #fed7aa); border-radius: var(--radius-md, 12px);
@@ -212,6 +226,17 @@ export default function SandkastenPage() {
   const [openComments, setOpenComments] = useState([]);
   const [showComposer, setShowComposer] = useState(false);
   const [draft, setDraft] = useState('');
+  const [draftPlaygroundId, setDraftPlaygroundId] = useState('');
+
+  const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
+
+  useEffect(() => {
+    fetchSpielplaetze()
+      .then((data) => {
+        if (data && data.length > 0) setPlaygrounds(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const posts = section === 'updates' ? updates : dates;
   const setPosts = section === 'updates' ? setUpdates : setDates;
@@ -238,9 +263,12 @@ export default function SandkastenPage() {
 
   const addPost = () => {
     const text = draft.trim();
-    if (!text) return;
+    if (!text || !draftPlaygroundId) return;
+    const pg = playgrounds.find((p) => String(p.id) === String(draftPlaygroundId));
     const newPost = {
       id: Date.now(),
+      playgroundId: draftPlaygroundId,
+      playgroundName: pg ? pg.name : 'Unbekannter Spielplatz',
       author: 'Du',
       time: 'gerade eben',
       text,
@@ -251,6 +279,7 @@ export default function SandkastenPage() {
     };
     setPosts((prev) => [newPost, ...prev]);
     setDraft('');
+    setDraftPlaygroundId('');
     setShowComposer(false);
   };
 
@@ -289,6 +318,7 @@ export default function SandkastenPage() {
                 </div>
                 {p.tag && <span className={`sk-tag ${p.tagType}`}>{p.tag}</span>}
               </div>
+              {p.playgroundName && <div className="sk-post-place">📍 {p.playgroundName}</div>}
               <p className="sk-text">{p.text}</p>
               <div className="sk-post-foot">
                 <button
@@ -323,6 +353,16 @@ export default function SandkastenPage() {
 
       {showComposer && (
         <div className="sk-composer">
+          <select
+            className="sk-select"
+            value={draftPlaygroundId}
+            onChange={(e) => setDraftPlaygroundId(e.target.value)}
+          >
+            <option value="">📍 Spielplatz wählen…</option>
+            {playgrounds.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
           <textarea
             className="sk-textarea"
             placeholder={section === 'dates' ? 'Eine Verabredung vorschlagen…' : 'Was gibt es Neues?'}
@@ -331,10 +371,10 @@ export default function SandkastenPage() {
             rows={3}
           />
           <div className="sk-composer-actions">
-            <button className="sk-cancel" onClick={() => { setShowComposer(false); setDraft(''); }}>
+            <button className="sk-cancel" onClick={() => { setShowComposer(false); setDraft(''); setDraftPlaygroundId(''); }}>
               Abbrechen
             </button>
-            <button className="sk-submit" onClick={addPost} disabled={!draft.trim()}>
+            <button className="sk-submit" onClick={addPost} disabled={!draft.trim() || !draftPlaygroundId}>
               Posten
             </button>
           </div>
