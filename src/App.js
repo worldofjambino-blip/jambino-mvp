@@ -4,10 +4,10 @@ import JambinoMVP from './components/JambinoMVP';
 import BottomNavigation from './components/BottomNavigation';
 import FavoritesPage from './components/FavoritesPage';
 import ProfilePage from './components/ProfilePage';
+import SandkastenPage from './components/SandkastenPage';
 
 function App() {
   const [activeTab, setActiveTab] = useState('discover');
-
   return (
     <div className="app-container">
       {activeTab === 'discover' && (
@@ -15,19 +15,21 @@ function App() {
           <JambinoMVP />
         </div>
       )}
-
       {activeTab === 'favorites' && (
         <div className="page-content">
           <FavoritesPage />
         </div>
       )}
-
+      {activeTab === 'sandbox' && (
+        <div className="page-content">
+          <SandkastenPage />
+        </div>
+      )}
       {activeTab === 'profile' && (
         <div className="page-content">
           <ProfilePage />
         </div>
       )}
-
       <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
