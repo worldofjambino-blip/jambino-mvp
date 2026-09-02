@@ -3,12 +3,49 @@ import bgMobile from '../assets/jambino-background.jpg';
 import bgDesktop from '../assets/jambino-background-desktop.jpg';
 
 const INITIAL_UPDATES = [
-  { id: 1, author: 'Mama_Mia', time: 'Heute, 10:32', text: 'Der Spielplatz an der Ettenbergstrasse ist heute ziemlich voll 😅', tag: 'Voll', tagType: 'voll', likes: 12, comments: 3 },
-  { id: 2, author: 'Papa_Bear', time: 'Heute, 09:15', text: 'Die Schaukel wurde repariert! Danke an alle fleißigen Helfer 🙌', tag: 'Info', tagType: 'info', likes: 8, comments: 2 },
+  {
+    id: 1,
+    author: 'Mama_Mia',
+    time: 'Heute, 10:32',
+    text: 'Der Spielplatz an der Ettenbergstrasse ist heute ziemlich voll 😅',
+    tag: 'Voll',
+    tagType: 'voll',
+    likes: 12,
+    comments: [
+      { id: 11, author: 'Papa_Bear', text: 'Danke für die Info! Dann gehen wir später.' },
+      { id: 12, author: 'Lena_M', text: 'Bei uns war es heute Morgen noch ruhig.' },
+      { id: 13, author: 'Tom', text: 'Gibt es dort Schatten?' },
+    ],
+  },
+  {
+    id: 2,
+    author: 'Papa_Bear',
+    time: 'Heute, 09:15',
+    text: 'Die Schaukel wurde repariert! Danke an alle fleißigen Helfer 🙌',
+    tag: 'Info',
+    tagType: 'info',
+    likes: 8,
+    comments: [
+      { id: 21, author: 'Mama_Mia', text: 'Super, endlich! 🎉' },
+      { id: 22, author: 'Sandra', text: 'Wer war der Held? 😄' },
+    ],
+  },
 ];
 
 const INITIAL_DATES = [
-  { id: 101, author: 'Kita_Sonnenschein', time: 'Gestern, 16:45', text: 'Wir planen ein Spielfest nächsten Samstag um 15 Uhr im Stadtpark. Wer kommt mit? 📍', tag: 'Treffen', tagType: 'treffen', likes: 15, comments: 7 },
+  {
+    id: 101,
+    author: 'Kita_Sonnenschein',
+    time: 'Gestern, 16:45',
+    text: 'Wir planen ein Spielfest nächsten Samstag um 15 Uhr im Stadtpark. Wer kommt mit? 📍',
+    tag: 'Treffen',
+    tagType: 'treffen',
+    likes: 15,
+    comments: [
+      { id: 111, author: 'Mama_Mia', text: 'Wir sind dabei! 🙌' },
+      { id: 112, author: 'Papa_Bear', text: 'Klingt super, wir kommen auch.' },
+    ],
+  },
 ];
 
 const SK_STYLES = `
@@ -72,6 +109,40 @@ const SK_STYLES = `
   }
   .sk-action.liked { color: var(--jambino-pink, #ec4899); }
 
+  .sk-comments {
+    margin-top: 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .sk-comment { display: flex; gap: 8px; align-items: flex-start; }
+  .sk-comment-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--jambino-cream, #fff7ed);
+    display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex: 0 0 auto;
+  }
+  .sk-comment-bubble {
+    background: var(--jambino-cream, #fff7ed);
+    border-radius: var(--radius-md, 12px);
+    padding: 6px 10px; flex: 1 1 auto; min-width: 0;
+  }
+  .sk-comment-author { font-weight: 700; font-size: 0.82rem; color: var(--text-dark, #222); }
+  .sk-comment-text { font-size: 0.88rem; color: var(--text-dark, #333); margin: 2px 0 0 0; }
+
+  .sk-comment-form { display: flex; gap: 8px; margin-top: 4px; }
+  .sk-comment-input {
+    flex: 1 1 auto; min-width: 0;
+    border: 2px solid var(--jambino-orange-soft, #fed7aa);
+    border-radius: var(--radius-pill, 999px);
+    padding: 8px 14px; font-size: 0.92rem; font-family: inherit; color: var(--text-dark, #222);
+  }
+  .sk-comment-input:focus { outline: none; border-color: var(--jambino-orange, #f97316); }
+  .sk-comment-send {
+    background: var(--jambino-orange, #f97316); color: #fff; border: none;
+    border-radius: var(--radius-pill, 999px); padding: 8px 16px; font-weight: 700; cursor: pointer; flex: 0 0 auto;
+  }
+  .sk-comment-send:disabled { background: var(--jambino-orange-soft, #fed7aa); cursor: not-allowed; }
+
   .sk-empty {
     max-width: 600px; margin: 0 auto; text-align: center;
     background: rgba(255, 255, 255, 0.92); border-radius: var(--radius-lg, 16px);
@@ -109,11 +180,36 @@ const SK_STYLES = `
   .sk-compose-btn:hover { transform: translateY(-1px); }
 `;
 
+function CommentForm({ onSubmit }) {
+  const [value, setValue] = useState('');
+  const submit = () => {
+    const text = value.trim();
+    if (!text) return;
+    onSubmit(text);
+    setValue('');
+  };
+  return (
+    <div className="sk-comment-form">
+      <input
+        className="sk-comment-input"
+        placeholder="Kommentar schreiben…"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+      />
+      <button className="sk-comment-send" onClick={submit} disabled={!value.trim()}>
+        Senden
+      </button>
+    </div>
+  );
+}
+
 export default function SandkastenPage() {
   const [section, setSection] = useState('updates');
   const [updates, setUpdates] = useState(INITIAL_UPDATES);
   const [dates, setDates] = useState(INITIAL_DATES);
   const [likedIds, setLikedIds] = useState([]);
+  const [openComments, setOpenComments] = useState([]);
   const [showComposer, setShowComposer] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -124,6 +220,20 @@ export default function SandkastenPage() {
     const liked = likedIds.includes(id);
     setLikedIds(liked ? likedIds.filter((x) => x !== id) : [...likedIds, id]);
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, likes: p.likes + (liked ? -1 : 1) } : p)));
+  };
+
+  const toggleComments = (id) => {
+    setOpenComments((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const addComment = (postId, text) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, comments: [...p.comments, { id: Date.now(), author: 'Du', text }] }
+          : p
+      )
+    );
   };
 
   const addPost = () => {
@@ -137,7 +247,7 @@ export default function SandkastenPage() {
       tag: section === 'dates' ? 'Treffen' : 'Neu',
       tagType: section === 'dates' ? 'treffen' : 'info',
       likes: 0,
-      comments: 0,
+      comments: [],
     };
     setPosts((prev) => [newPost, ...prev]);
     setDraft('');
@@ -187,8 +297,25 @@ export default function SandkastenPage() {
                 >
                   {likedIds.includes(p.id) ? '❤️' : '🤍'} {p.likes}
                 </button>
-                <span className="sk-action">💬 {p.comments}</span>
+                <button className="sk-action" onClick={() => toggleComments(p.id)}>
+                  💬 {p.comments.length}
+                </button>
               </div>
+
+              {openComments.includes(p.id) && (
+                <div className="sk-comments">
+                  {p.comments.map((c) => (
+                    <div key={c.id} className="sk-comment">
+                      <span className="sk-comment-avatar">🦊</span>
+                      <div className="sk-comment-bubble">
+                        <span className="sk-comment-author">{c.author}</span>
+                        <p className="sk-comment-text">{c.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <CommentForm onSubmit={(text) => addComment(p.id, text)} />
+                </div>
+              )}
             </div>
           ))
         )}
