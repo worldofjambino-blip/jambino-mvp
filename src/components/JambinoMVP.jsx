@@ -70,7 +70,6 @@ export const MOCK_PLAYGROUNDS = [
 
 const FALLBACK_IMAGE = '/jambino-placeholder.png';
 
-// Zahlenbereiche der Filter-Chips
 const CHIP_RANGES = {
   '0-3': [0, 3],
   '3-6': [3, 6],
@@ -78,8 +77,6 @@ const CHIP_RANGES = {
   '12+': [12, 99],
 };
 
-// Wandelt Altersangaben aus dem Sheet in Zahlenbereiche um,
-// z.B. "Bis 14 Jahre" -> [0,14], "Ab 3 Jahren" -> [3,99], "6-12" -> [6,12]
 const parseAgeRange = (text) => {
   if (!text) return null;
   const t = String(text).toLowerCase();
@@ -91,12 +88,64 @@ const parseAgeRange = (text) => {
   return [nums[0], nums[0]];
 };
 
-// Prüft, ob sich zwei Bereiche überschneiden
 const rangesOverlap = (a, b) => a[0] <= b[1] && b[0] <= a[1];
 
-// Solange die Bild-Links im Sheet noch nicht gepflegt sind, zeigen wir
-// überall den Platzhalter. Später wieder aktivieren: USE_SHEET_IMAGES = true
+const ageToChip = (age) => {
+  if (age === '' || age === null || age === undefined) return null;
+  const n = Number(age);
+  if (!Number.isFinite(n)) return null;
+  if (n < 3) return '0-3';
+  if (n < 6) return '3-6';
+  if (n < 12) return '6-12';
+  return '12+';
+};
+
 const USE_SHEET_IMAGES = false;
+
+const FAMILY_FILTER_STYLES = `
+  .family-filter-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--jambino-green-soft, #dcfce7);
+    border-radius: var(--radius-md, 12px);
+    padding: 10px 14px;
+    margin: 0 0 12px 0;
+  }
+  .family-filter-text {
+    font-weight: 600;
+    color: #166534;
+    font-size: 0.95rem;
+  }
+  .family-filter-clear {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-pill, 999px);
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--text-medium, #555);
+    white-space: nowrap;
+  }
+  .family-filter-clear:hover { background: rgba(0, 0, 0, 0.05); }
+  .family-filter-banner.is-off {
+    background: var(--jambino-cream, #fff7ed);
+    justify-content: flex-start;
+  }
+  .family-filter-apply {
+    background: var(--jambino-orange, #f97316);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill, 999px);
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .family-filter-apply:hover { transform: translateY(-1px); }
+`;
 
 const SafeImage = ({ src, alt, className }) => {
   const initial = USE_SHEET_IMAGES && src && src.startsWith('http') ? src : FALLBACK_IMAGE;
@@ -233,6 +282,8 @@ export default function JambinoMVP() {
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeChildren, setActiveChildren] = useState([]);
+  const [familyFilterOn, setFamilyFilterOn] = useState(false);
 
   const [favorites, setFavorites] = useState(() => {
     try {
@@ -260,6 +311,38 @@ export default function JambinoMVP() {
     localStorage.setItem('jambino_favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('jambino_profile');
+      if (!saved) return;
+      const profile = JSON.parse(saved);
+      const kids = Array.isArray(profile.children) ? profile.children : [];
+      const withChip = kids
+        .filter((c) => c.active !== false)
+        .map((c) => ({ name: c.name, age: c.age, chip: ageToChip(c.age) }))
+        .filter((c) => c.chip);
+      if (withChip.length > 0) {
+        const chips = [...new Set(withChip.map((c) => c.chip))];
+        setActiveChildren(withChip);
+        setFamilyFilterOn(true);
+        setFilters((f) => ({ ...f, ageGroups: chips }));
+      }
+    } catch (err) {
+      console.error('Fehler beim Lesen des Profils für den Familienfilter:', err);
+    }
+  }, []);
+
+  const applyFamilyFilter = () => {
+    const chips = [...new Set(activeChildren.map((c) => c.chip))];
+    setFamilyFilterOn(true);
+    setFilters((f) => ({ ...f, ageGroups: chips }));
+  };
+
+  const clearFamilyFilter = () => {
+    setFamilyFilterOn(false);
+    setFilters((f) => ({ ...f, ageGroups: [] }));
+  };
+
   const filteredPlaygrounds = useMemo(() => {
     return playgrounds.filter(pg => {
       const matchesSearch =
@@ -269,7 +352,6 @@ export default function JambinoMVP() {
       if (filters.ageGroups.length > 0) {
         const selectedRanges = filters.ageGroups.map(a => CHIP_RANGES[a]).filter(Boolean);
         const pgRanges = (pg.ageGroups || []).map(parseAgeRange).filter(Boolean);
-        // Spielplätze ohne auswertbare Altersangabe bleiben sichtbar
         if (pgRanges.length > 0) {
           const matches = selectedRanges.some(sel =>
             pgRanges.some(pgr => rangesOverlap(sel, pgr))
@@ -283,6 +365,7 @@ export default function JambinoMVP() {
 
   return (
     <div className="jambino-app">
+      <style>{FAMILY_FILTER_STYLES}</style>
       <header className="app-header">
         <img src="/jambino-logo.png" alt="Jambino Fuchs" className="app-logo" />
         <div className="header-text">
@@ -303,7 +386,28 @@ export default function JambinoMVP() {
 
       <div className="main-layout">
         <div className="sidebar">
-          <FilterPanel filters={filters} onFilterChange={setFilters} />
+          {activeChildren.length > 0 && (
+            familyFilterOn ? (
+              <div className="family-filter-banner">
+                <span className="family-filter-text">
+                  👨‍👩‍👧 Passende Spielplätze für {activeChildren.map((c) => c.name).join(' & ')}
+                </span>
+                <button className="family-filter-clear" onClick={clearFamilyFilter}>
+                  ✕ Alle Altersgruppen
+                </button>
+              </div>
+            ) : (
+              <div className="family-filter-banner is-off">
+                <button className="family-filter-apply" onClick={applyFamilyFilter}>
+                  👨‍👩‍👧 Für {activeChildren.map((c) => c.name).join(' & ')} filtern
+                </button>
+              </div>
+            )
+          )}
+          <FilterPanel
+            filters={filters}
+            onFilterChange={(nf) => { setFilters(nf); setFamilyFilterOn(false); }}
+          />
           <PlaygroundList
             playgrounds={filteredPlaygrounds}
             onSelectPlayground={setSelectedPlayground}
