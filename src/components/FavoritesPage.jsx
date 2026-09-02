@@ -232,7 +232,7 @@ export default function FavoritesPage({ onDiscover }) {
                   </div>
                   <div className="fav-badges">
                     {(pg.ageGroups || []).map((a) => (
-                      <span key={a} className="fav-badge age">{a} Jahre</span>
+                      <span key={a} className="fav-badge age">{a}</span>
                     ))}
                     {featureBadges(pg).map((f) => (
                       <span key={f.key} className="fav-badge feature">{f.label}</span>
