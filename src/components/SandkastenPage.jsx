@@ -70,6 +70,8 @@ const INITIAL_DATES = [
   },
 ];
 
+const STORAGE_KEY = 'jambino_sandkasten';
+
 function loadFavorites() {
   try {
     const saved = localStorage.getItem('jambino_favorites');
@@ -78,6 +80,23 @@ function loadFavorites() {
     console.error('Fehler beim Laden der Favoriten:', err);
     return [];
   }
+}
+
+function loadStore() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        updates: Array.isArray(parsed.updates) ? parsed.updates : INITIAL_UPDATES,
+        dates: Array.isArray(parsed.dates) ? parsed.dates : INITIAL_DATES,
+        likedIds: Array.isArray(parsed.likedIds) ? parsed.likedIds : [],
+      };
+    }
+  } catch (err) {
+    console.error('Fehler beim Laden des Sandkastens:', err);
+  }
+  return { updates: INITIAL_UPDATES, dates: INITIAL_DATES, likedIds: [] };
 }
 
 const SK_STYLES = `
@@ -155,6 +174,7 @@ const SK_STYLES = `
   .sk-tag.voll { background: #fee2e2; color: #b91c1c; }
   .sk-tag.info { background: #dbeafe; color: #1d4ed8; }
   .sk-tag.treffen { background: #ede9fe; color: #6d28d9; }
+  .sk-tag.neu { background: #dcfce7; color: #166534; }
   .sk-text { color: var(--text-dark, #222); margin: 0 0 10px 0; line-height: 1.4; }
   .sk-post-foot { display: flex; gap: 16px; align-items: center; }
   .sk-action {
@@ -272,9 +292,9 @@ function CommentForm({ onSubmit }) {
 
 export default function SandkastenPage() {
   const [section, setSection] = useState('updates');
-  const [updates, setUpdates] = useState(INITIAL_UPDATES);
-  const [dates, setDates] = useState(INITIAL_DATES);
-  const [likedIds, setLikedIds] = useState([]);
+  const [updates, setUpdates] = useState(() => loadStore().updates);
+  const [dates, setDates] = useState(() => loadStore().dates);
+  const [likedIds, setLikedIds] = useState(() => loadStore().likedIds);
   const [openComments, setOpenComments] = useState([]);
   const [showComposer, setShowComposer] = useState(false);
   const [draft, setDraft] = useState('');
@@ -293,6 +313,15 @@ export default function SandkastenPage() {
       .catch(() => {});
   }, []);
 
+  // Speichern, sobald sich Beiträge, Verabredungen oder Likes ändern
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ updates, dates, likedIds }));
+    } catch (err) {
+      console.error('Fehler beim Speichern des Sandkastens:', err);
+    }
+  }, [updates, dates, likedIds]);
+
   const posts = section === 'updates' ? updates : dates;
   const setPosts = section === 'updates' ? setUpdates : setDates;
 
@@ -303,7 +332,6 @@ export default function SandkastenPage() {
     ? posts.filter((p) => favSet.has(String(p.playgroundId)))
     : posts;
 
-  // Beiträge nach Spielplatz gruppieren (Reihenfolge = erstes Auftreten)
   const groups = [];
   const groupMap = new Map();
   scopedPosts.forEach((p) => {
@@ -349,11 +377,15 @@ export default function SandkastenPage() {
       time: 'gerade eben',
       text,
       tag: section === 'dates' ? 'Treffen' : 'Neu',
-      tagType: section === 'dates' ? 'treffen' : 'info',
+      tagType: section === 'dates' ? 'treffen' : 'neu',
       likes: 0,
       comments: [],
     };
     setPosts((prev) => [newPost, ...prev]);
+    // Damit der neue Beitrag garantiert sichtbar ist:
+    if (scope === 'favorites' && !favSet.has(String(draftPlaygroundId))) {
+      setScope('all');
+    }
     setDraft('');
     setDraftPlaygroundId('');
     setShowComposer(false);
