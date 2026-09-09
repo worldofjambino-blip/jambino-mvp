@@ -12,7 +12,7 @@ function App() {
     <div className="app-container">
       {activeTab === 'discover' && (
         <div className="page-content">
-          <JambinoMVP />
+          <JambinoMVP onOpenSandkasten={() => setActiveTab('sandbox')} />
         </div>
       )}
       {activeTab === 'favorites' && (

@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './JambinoMVP.css';
+import { SANDKASTEN_ACTIVITY } from '../data/sandkastenActivity';
 
 export const MOCK_PLAYGROUNDS = [
   {
@@ -102,6 +103,9 @@ const ageToChip = (age) => {
 
 const USE_SHEET_IMAGES = false;
 
+// Aktivität aus dem Sandkasten schnell nach playgroundId nachschlagbar machen
+const ACTIVITY_BY_ID = new Map(SANDKASTEN_ACTIVITY.map((a) => [String(a.playgroundId), a]));
+
 const FAMILY_FILTER_STYLES = `
   .family-filter-banner {
     display: flex;
@@ -145,6 +149,20 @@ const FAMILY_FILTER_STYLES = `
     cursor: pointer;
   }
   .family-filter-apply:hover { transform: translateY(-1px); }
+
+  .sk-pop-tag {
+    display: inline-block;
+    font-size: 0.7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px; margin: 4px 0 2px 0;
+  }
+  .sk-pop-tag.voll { background: #fee2e2; color: #b91c1c; }
+  .sk-pop-tag.info { background: #dbeafe; color: #1d4ed8; }
+  .sk-pop-tag.treffen { background: #ede9fe; color: #6d28d9; }
+  .sk-pop-text { font-size: 0.82rem; color: #333; margin: 2px 0 6px 0; }
+  .sk-pop-btn {
+    background: var(--jambino-orange, #f97316); color: #fff; border: none;
+    border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; cursor: pointer;
+  }
 `;
 
 const SafeImage = ({ src, alt, className }) => {
@@ -277,7 +295,7 @@ const PlaygroundModal = ({ playground, onClose }) => {
   );
 };
 
-export default function JambinoMVP() {
+export default function JambinoMVP({ onOpenSandkasten }) {
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
   const [filters, setFilters] = useState({ ageGroups: [], equipment: [], amenities: [] });
   const [selectedPlayground, setSelectedPlayground] = useState(null);
@@ -422,26 +440,42 @@ export default function JambinoMVP() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; OpenStreetMap'
             />
-            {filteredPlaygrounds.map(pg => (
-              <Marker
-                key={pg.id}
-                position={[pg.latitude, pg.longitude]}
-                icon={L.icon({
-                  iconUrl: '/jambino-pin.svg',
-                  iconSize: [28, 40],
-                  iconAnchor: [14, 40],
-                  popupAnchor: [0, -40],
-                })}
-                eventHandlers={{
-                  click: () => setSelectedPlayground(pg),
-                }}
-              >
-                <Popup>
-                  <h3>{pg.name}</h3>
-                  <p>{pg.city}</p>
-                </Popup>
-              </Marker>
-            ))}
+            {filteredPlaygrounds.map(pg => {
+              const activity = ACTIVITY_BY_ID.get(String(pg.id));
+              return (
+                <Marker
+                  key={pg.id}
+                  position={[pg.latitude, pg.longitude]}
+                  icon={L.icon({
+                    iconUrl: '/jambino-pin.svg',
+                    iconSize: activity ? [34, 48] : [28, 40],
+                    iconAnchor: activity ? [17, 48] : [14, 40],
+                    popupAnchor: [0, activity ? -48 : -40],
+                    className: activity ? 'pin-has-activity' : '',
+                  })}
+                  eventHandlers={{
+                    click: () => setSelectedPlayground(pg),
+                  }}
+                >
+                  <Popup>
+                    <h3 style={{ margin: '0 0 2px 0' }}>{pg.name}</h3>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>{pg.city}</p>
+                    {activity && (
+                      <div>
+                        <span className={`sk-pop-tag ${activity.tagType}`}>{activity.tag}</span>
+                        <p className="sk-pop-text">{activity.latest}</p>
+                        <button
+                          className="sk-pop-btn"
+                          onClick={() => { if (typeof onOpenSandkasten === 'function') onOpenSandkasten(); }}
+                        >
+                          💬 Sandkasten öffnen{activity.count ? ` (${activity.count})` : ''}
+                        </button>
+                      </div>
+                    )}
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
         </div>
       </div>
