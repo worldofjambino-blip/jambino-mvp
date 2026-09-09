@@ -70,6 +70,16 @@ const INITIAL_DATES = [
   },
 ];
 
+function loadFavorites() {
+  try {
+    const saved = localStorage.getItem('jambino_favorites');
+    return saved ? JSON.parse(saved) : [];
+  } catch (err) {
+    console.error('Fehler beim Laden der Favoriten:', err);
+    return [];
+  }
+}
+
 const SK_STYLES = `
   .sandkasten-page {
     min-height: 100vh;
@@ -92,7 +102,7 @@ const SK_STYLES = `
   .sk-hero-title { color: var(--jambino-orange, #f97316); font-size: 1.5rem; margin: 0; }
   .sk-hero-subtitle { color: var(--text-medium, #555); font-size: 0.9rem; margin: 2px 0 0 0; }
 
-  .sk-tabs { max-width: 600px; margin: 0 auto 12px auto; display: flex; gap: 8px; }
+  .sk-tabs { max-width: 600px; margin: 0 auto 10px auto; display: flex; gap: 8px; }
   .sk-tab {
     flex: 1; padding: 10px 12px; border: none; cursor: pointer;
     border-radius: var(--radius-pill, 999px);
@@ -100,6 +110,16 @@ const SK_STYLES = `
     font-weight: 700; font-size: 0.9rem;
   }
   .sk-tab.active { background: var(--jambino-orange, #f97316); color: #fff; box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.1)); }
+
+  .sk-scope { max-width: 600px; margin: 0 auto 14px auto; display: flex; gap: 8px; justify-content: center; }
+  .sk-scope-btn {
+    border: 2px solid var(--jambino-orange-soft, #fed7aa);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--jambino-orange, #f97316);
+    font-weight: 700; font-size: 0.85rem;
+    padding: 6px 16px; border-radius: var(--radius-pill, 999px); cursor: pointer;
+  }
+  .sk-scope-btn.active { background: var(--jambino-orange, #f97316); color: #fff; border-color: var(--jambino-orange, #f97316); }
 
   .sk-list { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
@@ -183,6 +203,10 @@ const SK_STYLES = `
     background: rgba(255, 255, 255, 0.92); border-radius: var(--radius-lg, 16px);
     padding: 28px 20px; color: var(--text-medium, #555);
   }
+  .sk-empty-switch {
+    margin-top: 14px; background: var(--jambino-orange, #f97316); color: #fff; border: none;
+    border-radius: var(--radius-pill, 999px); padding: 8px 18px; font-weight: 700; cursor: pointer;
+  }
 
   .sk-composer {
     max-width: 600px; margin: 12px auto 0 auto;
@@ -256,6 +280,9 @@ export default function SandkastenPage() {
   const [draft, setDraft] = useState('');
   const [draftPlaygroundId, setDraftPlaygroundId] = useState('');
 
+  const [favorites] = useState(loadFavorites);
+  const [scope, setScope] = useState(() => (loadFavorites().length > 0 ? 'favorites' : 'all'));
+
   const [playgrounds, setPlaygrounds] = useState(MOCK_PLAYGROUNDS);
 
   useEffect(() => {
@@ -269,10 +296,17 @@ export default function SandkastenPage() {
   const posts = section === 'updates' ? updates : dates;
   const setPosts = section === 'updates' ? setUpdates : setDates;
 
+  const favSet = new Set(favorites.map((x) => String(x)));
+  const hasFavorites = favorites.length > 0;
+
+  const scopedPosts = scope === 'favorites'
+    ? posts.filter((p) => favSet.has(String(p.playgroundId)))
+    : posts;
+
   // Beiträge nach Spielplatz gruppieren (Reihenfolge = erstes Auftreten)
   const groups = [];
   const groupMap = new Map();
-  posts.forEach((p) => {
+  scopedPosts.forEach((p) => {
     if (!groupMap.has(p.playgroundId)) {
       const g = { id: p.playgroundId, name: p.playgroundName, ort: p.playgroundOrt, posts: [] };
       groupMap.set(p.playgroundId, g);
@@ -386,9 +420,31 @@ export default function SandkastenPage() {
         </button>
       </div>
 
+      <div className="sk-scope">
+        <button className={`sk-scope-btn ${scope === 'favorites' ? 'active' : ''}`} onClick={() => setScope('favorites')}>
+          ❤️ Meine Favoriten
+        </button>
+        <button className={`sk-scope-btn ${scope === 'all' ? 'active' : ''}`} onClick={() => setScope('all')}>
+          🗺️ Alle
+        </button>
+      </div>
+
       <div className="sk-list">
         {groups.length === 0 ? (
-          <div className="sk-empty">Noch keine Beiträge hier. Mach den Anfang!</div>
+          scope === 'favorites' ? (
+            <div className="sk-empty">
+              {hasFavorites
+                ? 'Für deine Favoriten gibt es hier noch keine Beiträge.'
+                : 'Du hast noch keine Favoriten. Tippe im Entdecken-Tab auf das 🤍 bei einem Spielplatz.'}
+              <div>
+                <button className="sk-empty-switch" onClick={() => setScope('all')}>
+                  Alle Spielplätze zeigen
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="sk-empty">Noch keine Beiträge hier. Mach den Anfang!</div>
+          )
         ) : (
           groups.map((g) => (
             <div key={g.id} className="sk-group">
