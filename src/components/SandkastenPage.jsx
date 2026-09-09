@@ -372,6 +372,7 @@ export default function SandkastenPage() {
       id: Date.now(),
       playgroundId: draftPlaygroundId,
       playgroundName: pg ? pg.name : 'Unbekannter Spielplatz',
+      playgroundKey: pg ? pg.name : '',
       playgroundOrt: ort,
       author: 'Du',
       time: 'gerade eben',

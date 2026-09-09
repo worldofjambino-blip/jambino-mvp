@@ -103,30 +103,35 @@ const ageToChip = (age) => {
 
 const USE_SHEET_IMAGES = false;
 
-const ACTIVITY_BY_ID = new Map(SANDKASTEN_ACTIVITY.map((a) => [String(a.playgroundId), a]));
+// Liest die echten Sandkasten-Beiträge aus localStorage und leitet je Spielplatz
+// die Aktivität ab (neuester Beitrag + Anzahl). Fällt auf die Beispiel-Daten zurück.
+function deriveActivity() {
+  try {
+    const saved = localStorage.getItem('jambino_sandkasten');
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    const all = [...(parsed.updates || []), ...(parsed.dates || [])];
+    if (all.length === 0) return null;
+    const byId = new Map();
+    all.forEach((p) => {
+      const key = String(p.playgroundKey || p.playgroundName || p.playgroundId);
+      if (!byId.has(key)) byId.set(key, []);
+      byId.get(key).push(p);
+    });
+    const result = new Map();
+    byId.forEach((posts, key) => {
+      posts.sort((a, b) => Number(b.id) - Number(a.id));
+      const latest = posts[0];
+      result.set(key, { tag: latest.tag, tagType: latest.tagType, latest: latest.text, count: posts.length });
+    });
+    return result;
+  } catch (err) {
+    console.error('Fehler beim Ableiten der Sandkasten-Aktivität:', err);
+    return null;
+  }
+}
 
-// Pin ohne Aktivität: schlichtes Bild-Icon
-const plainIcon = L.icon({
-  iconUrl: '/jambino-pin.svg',
-  iconSize: [28, 40],
-  iconAnchor: [14, 40],
-  popupAnchor: [0, -40],
-});
-
-// Pin MIT Aktivität: aus HTML gebaut, damit ein 💬-Badge oben draufsitzt
-const activityIcon = L.divIcon({
-  className: 'jambino-activity-marker',
-  html: `
-    <div class="pin-wrap">
-      <span class="pin-ring"></span>
-      <img src="/jambino-pin.svg" class="pin-img" alt="" />
-      <span class="pin-badge">💬</span>
-    </div>
-  `,
-  iconSize: [34, 46],
-  iconAnchor: [17, 46],
-  popupAnchor: [0, -46],
-});
+const FALLBACK_ACTIVITY = new Map(SANDKASTEN_ACTIVITY.map((a) => [String(a.playgroundId), a]));
 
 const FAMILY_FILTER_STYLES = `
   .family-filter-banner {
@@ -199,12 +204,34 @@ const FAMILY_FILTER_STYLES = `
   .sk-pop-tag.voll { background: #fee2e2; color: #b91c1c; }
   .sk-pop-tag.info { background: #dbeafe; color: #1d4ed8; }
   .sk-pop-tag.treffen { background: #ede9fe; color: #6d28d9; }
+  .sk-pop-tag.neu { background: #dcfce7; color: #166534; }
   .sk-pop-text { font-size: 0.82rem; color: #333; margin: 2px 0 6px 0; }
   .sk-pop-btn {
     background: var(--jambino-orange, #f97316); color: #fff; border: none;
     border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; cursor: pointer;
   }
 `;
+
+const plainIcon = L.icon({
+  iconUrl: '/jambino-pin.svg',
+  iconSize: [28, 40],
+  iconAnchor: [14, 40],
+  popupAnchor: [0, -40],
+});
+
+const activityIcon = L.divIcon({
+  className: 'jambino-activity-marker',
+  html: `
+    <div class="pin-wrap">
+      <span class="pin-ring"></span>
+      <img src="/jambino-pin.svg" class="pin-img" alt="" />
+      <span class="pin-badge">💬</span>
+    </div>
+  `,
+  iconSize: [34, 46],
+  iconAnchor: [17, 46],
+  popupAnchor: [0, -46],
+});
 
 const SafeImage = ({ src, alt, className }) => {
   const initial = USE_SHEET_IMAGES && src && src.startsWith('http') ? src : FALLBACK_IMAGE;
@@ -343,6 +370,7 @@ export default function JambinoMVP({ onOpenSandkasten }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeChildren, setActiveChildren] = useState([]);
   const [familyFilterOn, setFamilyFilterOn] = useState(false);
+  const [activityById] = useState(() => deriveActivity() || FALLBACK_ACTIVITY);
 
   const [favorites, setFavorites] = useState(() => {
     try {
@@ -482,7 +510,7 @@ export default function JambinoMVP({ onOpenSandkasten }) {
               attribution='&copy; OpenStreetMap'
             />
             {filteredPlaygrounds.map(pg => {
-              const activity = ACTIVITY_BY_ID.get(String(pg.id));
+              const activity = activityById.get(String(pg.name)) || activityById.get(String(pg.id));
               return (
                 <Marker
                   key={pg.id}
