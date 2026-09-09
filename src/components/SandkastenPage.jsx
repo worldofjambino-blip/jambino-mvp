@@ -22,6 +22,19 @@ const INITIAL_UPDATES = [
     ],
   },
   {
+    id: 3,
+    playgroundId: 1,
+    playgroundName: 'Ettenbergstrasse',
+    playgroundOrt: 'Schaffhausen',
+    author: 'Tom_K',
+    time: 'Heute, 08:40',
+    text: 'Der Sandkasten wurde frisch aufgefüllt – top! 🏖️',
+    tag: 'Info',
+    tagType: 'info',
+    likes: 5,
+    comments: [],
+  },
+  {
     id: 2,
     playgroundId: 2,
     playgroundName: 'Schulstrasse 5',
@@ -88,7 +101,20 @@ const SK_STYLES = `
   }
   .sk-tab.active { background: var(--jambino-orange, #f97316); color: #fff; box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.1)); }
 
-  .sk-list { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .sk-list { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .sk-group { display: flex; flex-direction: column; gap: 10px; }
+  .sk-group-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius-pill, 999px);
+    padding: 8px 14px;
+  }
+  .sk-group-title { font-weight: 800; color: var(--jambino-orange, #f97316); font-size: 1rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sk-group-count {
+    background: var(--jambino-orange, #f97316); color: #fff;
+    font-size: 0.75rem; font-weight: 700; border-radius: 999px; padding: 2px 10px; flex: 0 0 auto;
+  }
 
   .sk-post {
     background: rgba(255, 255, 255, 0.94);
@@ -96,7 +122,7 @@ const SK_STYLES = `
     padding: 14px 16px;
     box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.1));
   }
-  .sk-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .sk-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .sk-avatar {
     width: 38px; height: 38px; border-radius: 50%;
     background: var(--jambino-cream, #fff7ed);
@@ -109,7 +135,6 @@ const SK_STYLES = `
   .sk-tag.voll { background: #fee2e2; color: #b91c1c; }
   .sk-tag.info { background: #dbeafe; color: #1d4ed8; }
   .sk-tag.treffen { background: #ede9fe; color: #6d28d9; }
-  .sk-post-place { font-size: 0.8rem; color: var(--jambino-orange, #f97316); font-weight: 600; margin: 0 0 8px 0; }
   .sk-text { color: var(--text-dark, #222); margin: 0 0 10px 0; line-height: 1.4; }
   .sk-post-foot { display: flex; gap: 16px; align-items: center; }
   .sk-action {
@@ -244,6 +269,18 @@ export default function SandkastenPage() {
   const posts = section === 'updates' ? updates : dates;
   const setPosts = section === 'updates' ? setUpdates : setDates;
 
+  // Beiträge nach Spielplatz gruppieren (Reihenfolge = erstes Auftreten)
+  const groups = [];
+  const groupMap = new Map();
+  posts.forEach((p) => {
+    if (!groupMap.has(p.playgroundId)) {
+      const g = { id: p.playgroundId, name: p.playgroundName, ort: p.playgroundOrt, posts: [] };
+      groupMap.set(p.playgroundId, g);
+      groups.push(g);
+    }
+    groupMap.get(p.playgroundId).posts.push(p);
+  });
+
   const toggleLike = (id) => {
     const liked = likedIds.includes(id);
     setLikedIds(liked ? likedIds.filter((x) => x !== id) : [...likedIds, id]);
@@ -288,6 +325,46 @@ export default function SandkastenPage() {
     setShowComposer(false);
   };
 
+  const renderPost = (p) => (
+    <div key={p.id} className="sk-post">
+      <div className="sk-post-head">
+        <span className="sk-avatar">🦊</span>
+        <div className="sk-meta">
+          <span className="sk-author">{p.author}</span>
+          <span className="sk-time">{p.time}</span>
+        </div>
+        {p.tag && <span className={`sk-tag ${p.tagType}`}>{p.tag}</span>}
+      </div>
+      <p className="sk-text">{p.text}</p>
+      <div className="sk-post-foot">
+        <button
+          className={`sk-action ${likedIds.includes(p.id) ? 'liked' : ''}`}
+          onClick={() => toggleLike(p.id)}
+        >
+          {likedIds.includes(p.id) ? '❤️' : '🤍'} {p.likes}
+        </button>
+        <button className="sk-action" onClick={() => toggleComments(p.id)}>
+          💬 {p.comments.length}
+        </button>
+      </div>
+
+      {openComments.includes(p.id) && (
+        <div className="sk-comments">
+          {p.comments.map((c) => (
+            <div key={c.id} className="sk-comment">
+              <span className="sk-comment-avatar">🦊</span>
+              <div className="sk-comment-bubble">
+                <span className="sk-comment-author">{c.author}</span>
+                <p className="sk-comment-text">{c.text}</p>
+              </div>
+            </div>
+          ))}
+          <CommentForm onSubmit={(text) => addComment(p.id, text)} />
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="sandkasten-page">
       <style>{SK_STYLES}</style>
@@ -310,51 +387,16 @@ export default function SandkastenPage() {
       </div>
 
       <div className="sk-list">
-        {posts.length === 0 ? (
+        {groups.length === 0 ? (
           <div className="sk-empty">Noch keine Beiträge hier. Mach den Anfang!</div>
         ) : (
-          posts.map((p) => (
-            <div key={p.id} className="sk-post">
-              <div className="sk-post-head">
-                <span className="sk-avatar">🦊</span>
-                <div className="sk-meta">
-                  <span className="sk-author">{p.author}</span>
-                  <span className="sk-time">{p.time}</span>
-                </div>
-                {p.tag && <span className={`sk-tag ${p.tagType}`}>{p.tag}</span>}
+          groups.map((g) => (
+            <div key={g.id} className="sk-group">
+              <div className="sk-group-head">
+                <span className="sk-group-title">📍 {g.name}{g.ort ? ', ' + g.ort : ''}</span>
+                <span className="sk-group-count">{g.posts.length}</span>
               </div>
-              {p.playgroundName && (
-                <div className="sk-post-place">
-                  📍 {p.playgroundName}{p.playgroundOrt ? ', ' + p.playgroundOrt : ''}
-                </div>
-              )}
-              <p className="sk-text">{p.text}</p>
-              <div className="sk-post-foot">
-                <button
-                  className={`sk-action ${likedIds.includes(p.id) ? 'liked' : ''}`}
-                  onClick={() => toggleLike(p.id)}
-                >
-                  {likedIds.includes(p.id) ? '❤️' : '🤍'} {p.likes}
-                </button>
-                <button className="sk-action" onClick={() => toggleComments(p.id)}>
-                  💬 {p.comments.length}
-                </button>
-              </div>
-
-              {openComments.includes(p.id) && (
-                <div className="sk-comments">
-                  {p.comments.map((c) => (
-                    <div key={c.id} className="sk-comment">
-                      <span className="sk-comment-avatar">🦊</span>
-                      <div className="sk-comment-bubble">
-                        <span className="sk-comment-author">{c.author}</span>
-                        <p className="sk-comment-text">{c.text}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <CommentForm onSubmit={(text) => addComment(p.id, text)} />
-                </div>
-              )}
+              {g.posts.map((p) => renderPost(p))}
             </div>
           ))
         )}
