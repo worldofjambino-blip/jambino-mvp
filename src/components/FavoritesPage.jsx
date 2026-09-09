@@ -176,7 +176,7 @@ export default function FavoritesPage({ onDiscover }) {
       <div className="fav-hero">
         <img src="/jambino-logo.png" alt="Jambino Fuchs" className="fav-hero-logo" />
         <div>
-          <h1 className="fav-hero-title">Meine Favoriten</h1>
+          <h1 className="fav-hero-title">Unsere Familienlieblinge</h1>
           <p className="fav-hero-subtitle">Deine Lieblingsspielplätze auf einen Blick</p>
         </div>
       </div>
