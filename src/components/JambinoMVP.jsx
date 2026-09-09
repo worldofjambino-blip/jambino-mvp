@@ -118,6 +118,7 @@ const activityIcon = L.divIcon({
   className: 'jambino-activity-marker',
   html: `
     <div class="pin-wrap">
+      <span class="pin-ring"></span>
       <img src="/jambino-pin.svg" class="pin-img" alt="" />
       <span class="pin-badge">💬</span>
     </div>
@@ -174,13 +175,20 @@ const FAMILY_FILTER_STYLES = `
   .jambino-activity-marker { background: transparent; border: none; }
   .pin-wrap { position: relative; width: 34px; height: 46px; }
   .pin-img { width: 34px; height: 46px; display: block; }
+  .pin-ring {
+    position: absolute; left: 50%; top: 40px;
+    width: 26px; height: 26px; transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--jambino-green, #22C55E);
+    opacity: 0.35;
+  }
   .pin-badge {
     position: absolute; top: -6px; right: -8px;
     background: #fff; border-radius: 50%;
     width: 22px; height: 22px;
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
-    border: 2px solid var(--jambino-orange, #f97316);
+    border: 2px solid var(--jambino-green, #22C55E);
   }
 
   .sk-pop-tag {
