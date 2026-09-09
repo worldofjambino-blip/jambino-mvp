@@ -320,7 +320,7 @@ const PlaygroundModal = ({ playground, onClose }) => {
           {playground.city && <p className="modal-location">📍 {playground.city}</p>}
           {playground.rating && (
             <div className="modal-rating">
-              ⭐ {playground.rating}{playground.reviews ? ` (${playground.reviews} Bewertungen)` : ''}
+              🐾 {playground.rating}{playground.reviews ? ` (${playground.reviews} Bewertungen)` : ''}
             </div>
           )}
           {playground.ageGroups && playground.ageGroups.length > 0 && (
