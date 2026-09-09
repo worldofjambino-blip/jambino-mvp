@@ -223,7 +223,7 @@ export default function FavoritesPage({ onDiscover }) {
                   <h3 className="fav-card-title">{pg.name}</h3>
                   {pg.city && <p className="fav-card-location">📍 {pg.city}</p>}
                   <div className="fav-card-rating">
-                    <span className="fav-stars">{'⭐'.repeat(Math.round(pg.rating || 4))}</span>
+                    <span className="fav-stars">{'🐾'.repeat(Math.round(pg.rating || 4))}</span>
                     {pg.rating && (
                       <span className="fav-rating-value">
                         {pg.rating}{pg.reviews ? ` (${pg.reviews})` : ''}

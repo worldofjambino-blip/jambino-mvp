@@ -278,7 +278,7 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
               <h4 className="list-item-title">{pg.name}</h4>
               {pg.city && <p className="list-item-location">📍 {pg.city}</p>}
               <div className="list-item-rating">
-                <span className="stars">{'⭐'.repeat(Math.round(pg.rating || 4))}</span>
+                <span className="stars">{'🐾'.repeat(Math.round(pg.rating || 4))}</span>
                 {pg.rating && <span className="rating-value">{pg.rating}</span>}
               </div>
               {pg.ageGroups && pg.ageGroups.length > 0 && (
