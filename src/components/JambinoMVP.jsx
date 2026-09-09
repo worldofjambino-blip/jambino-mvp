@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { fetchSpielplaetze } from '../api/googleSheets';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './JambinoMVP.css';
@@ -212,26 +212,51 @@ const FAMILY_FILTER_STYLES = `
   }
 `;
 
-const plainIcon = L.icon({
-  iconUrl: '/jambino-pin.svg',
-  iconSize: [28, 40],
-  iconAnchor: [14, 40],
-  popupAnchor: [0, -40],
-});
+function getPinScale(zoom) {
+  const minZoom = 8;
+  const maxZoom = 13;
+  const minScale = 0.5;
+  if (zoom <= minZoom) return minScale;
+  if (zoom >= maxZoom) return 1;
+  const t = (zoom - minZoom) / (maxZoom - minZoom);
+  return minScale + t * (1 - minScale);
+}
 
-const activityIcon = L.divIcon({
-  className: 'jambino-activity-marker',
-  html: `
-    <div class="pin-wrap">
-      <span class="pin-ring"></span>
-      <img src="/jambino-pin.svg" class="pin-img" alt="" />
-      <span class="pin-badge">💬</span>
-    </div>
-  `,
-  iconSize: [34, 46],
-  iconAnchor: [17, 46],
-  popupAnchor: [0, -46],
-});
+function makePlainIcon(scale) {
+  const w = Math.round(28 * scale);
+  const h = Math.round(40 * scale);
+  return L.icon({
+    iconUrl: '/jambino-pin.svg',
+    iconSize: [w, h],
+    iconAnchor: [Math.round(w / 2), h],
+    popupAnchor: [0, -h],
+  });
+}
+
+function makeActivityIcon(scale) {
+  const w = Math.round(34 * scale);
+  const h = Math.round(46 * scale);
+  return L.divIcon({
+    className: 'jambino-activity-marker',
+    html: `
+      <div class="pin-wrap" style="width:${w}px;height:${h}px;">
+        <span class="pin-ring"></span>
+        <img src="/jambino-pin.svg" class="pin-img" style="width:${w}px;height:${h}px;" alt="" />
+        <span class="pin-badge">💬</span>
+      </div>
+    `,
+    iconSize: [w, h],
+    iconAnchor: [Math.round(w / 2), h],
+    popupAnchor: [0, -h],
+  });
+}
+
+function ZoomWatcher({ onZoomChange }) {
+  useMapEvents({
+    zoomend: (e) => onZoomChange(e.target.getZoom()),
+  });
+  return null;
+}
 
 const SafeImage = ({ src, alt, className }) => {
   const initial = USE_SHEET_IMAGES && src && src.startsWith('http') ? src : FALLBACK_IMAGE;
@@ -371,6 +396,9 @@ export default function JambinoMVP({ onOpenSandkasten }) {
   const [activeChildren, setActiveChildren] = useState([]);
   const [familyFilterOn, setFamilyFilterOn] = useState(false);
   const [activityById] = useState(() => deriveActivity() || FALLBACK_ACTIVITY);
+  const [mapZoom, setMapZoom] = useState(9);
+  const plainIcon = useMemo(() => makePlainIcon(getPinScale(mapZoom)), [mapZoom]);
+  const activityIcon = useMemo(() => makeActivityIcon(getPinScale(mapZoom)), [mapZoom]);
 
   const [favorites, setFavorites] = useState(() => {
     try {
@@ -505,6 +533,7 @@ export default function JambinoMVP({ onOpenSandkasten }) {
 
         <div className="map-container">
           <MapContainer center={[47.75, 8.95]} zoom={9} className="leaflet-map">
+            <ZoomWatcher onZoomChange={setMapZoom} />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; OpenStreetMap'
