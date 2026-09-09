@@ -455,7 +455,7 @@ export default function SandkastenPage() {
 
       <div className="sk-scope">
         <button className={`sk-scope-btn ${scope === 'favorites' ? 'active' : ''}`} onClick={() => setScope('favorites')}>
-          ❤️ Meine Favoriten
+          ❤️ Meine Spielplätze
         </button>
         <button className={`sk-scope-btn ${scope === 'all' ? 'active' : ''}`} onClick={() => setScope('all')}>
           🗺️ Alle
