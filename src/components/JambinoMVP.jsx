@@ -103,8 +103,29 @@ const ageToChip = (age) => {
 
 const USE_SHEET_IMAGES = false;
 
-// Aktivität aus dem Sandkasten schnell nach playgroundId nachschlagbar machen
 const ACTIVITY_BY_ID = new Map(SANDKASTEN_ACTIVITY.map((a) => [String(a.playgroundId), a]));
+
+// Pin ohne Aktivität: schlichtes Bild-Icon
+const plainIcon = L.icon({
+  iconUrl: '/jambino-pin.svg',
+  iconSize: [28, 40],
+  iconAnchor: [14, 40],
+  popupAnchor: [0, -40],
+});
+
+// Pin MIT Aktivität: aus HTML gebaut, damit ein 💬-Badge oben draufsitzt
+const activityIcon = L.divIcon({
+  className: 'jambino-activity-marker',
+  html: `
+    <div class="pin-wrap">
+      <img src="/jambino-pin.svg" class="pin-img" alt="" />
+      <span class="pin-badge">💬</span>
+    </div>
+  `,
+  iconSize: [34, 46],
+  iconAnchor: [17, 46],
+  popupAnchor: [0, -46],
+});
 
 const FAMILY_FILTER_STYLES = `
   .family-filter-banner {
@@ -149,6 +170,18 @@ const FAMILY_FILTER_STYLES = `
     cursor: pointer;
   }
   .family-filter-apply:hover { transform: translateY(-1px); }
+
+  .jambino-activity-marker { background: transparent; border: none; }
+  .pin-wrap { position: relative; width: 34px; height: 46px; }
+  .pin-img { width: 34px; height: 46px; display: block; }
+  .pin-badge {
+    position: absolute; top: -6px; right: -8px;
+    background: #fff; border-radius: 50%;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    border: 2px solid var(--jambino-orange, #f97316);
+  }
 
   .sk-pop-tag {
     display: inline-block;
@@ -446,13 +479,7 @@ export default function JambinoMVP({ onOpenSandkasten }) {
                 <Marker
                   key={pg.id}
                   position={[pg.latitude, pg.longitude]}
-                  icon={L.icon({
-                    iconUrl: '/jambino-pin.svg',
-                    iconSize: activity ? [34, 48] : [28, 40],
-                    iconAnchor: activity ? [17, 48] : [14, 40],
-                    popupAnchor: [0, activity ? -48 : -40],
-                    className: activity ? 'pin-has-activity' : '',
-                  })}
+                  icon={activity ? activityIcon : plainIcon}
                   eventHandlers={{
                     click: () => setSelectedPlayground(pg),
                   }}
