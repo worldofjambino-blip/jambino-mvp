@@ -93,7 +93,7 @@ const ageToChip = (age) => {
   return '12+';
 };
 
-const USE_SHEET_IMAGES = false;
+const USE_SHEET_IMAGES = true;
 
 // Liest die echten Sandkasten-Beiträge aus localStorage und leitet je Spielplatz
 // die Aktivität ab (neuester Beitrag + Anzahl). Fällt auf die Beispiel-Daten zurück.

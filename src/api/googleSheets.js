@@ -30,7 +30,7 @@ export async function fetchSpielplaetze() {
         description: cols[9]?.trim() || '',
         kategorie: cols[10]?.trim() || '',
         altersempfehlung: cols[11]?.trim() || '',
-        coverImage: 'https://images.unsplash.com/photo-1552810309-ed75afc4a9ad?w=600',
+        coverImage: cols[8]?.trim() || '',
         ageGroups: cols[11]?.trim() ? [cols[11].trim()] : ['0-14'],
       };
     })
