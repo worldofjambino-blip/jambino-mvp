@@ -215,7 +215,7 @@ const FAMILY_FILTER_STYLES = `
 function getPinScale(zoom) {
   const minZoom = 8;
   const maxZoom = 13;
-  const minScale = 0.5;
+  const minScale = 0.15;
   if (zoom <= minZoom) return minScale;
   if (zoom >= maxZoom) return 1;
   const t = (zoom - minZoom) / (maxZoom - minZoom);
