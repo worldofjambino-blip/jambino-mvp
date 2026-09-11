@@ -15,8 +15,6 @@ export const MOCK_PLAYGROUNDS = [
     city: 'Konstanz',
     country: 'DE',
     description: 'Wunderbar gelegener Spielplatz direkt am Bodensee mit Wasserspielbereich.',
-    rating: 4.7,
-    reviews: 23,
     equipment: { slide: true, swing: true, sandbox: true, climbing: false, water: true },
     amenities: { shade: true, toilets: true, parking: true, restaurant: false },
     ageGroups: ['3-6', '6-12'],
@@ -30,8 +28,6 @@ export const MOCK_PLAYGROUNDS = [
     city: 'Schaffhausen',
     country: 'CH',
     description: 'Großzügiger Spielplatz mit Wiese und Klettergerüsten.',
-    rating: 4.5,
-    reviews: 18,
     equipment: { slide: true, swing: true, sandbox: false, climbing: true, water: false },
     amenities: { shade: true, toilets: false, parking: true, restaurant: false },
     ageGroups: ['6-12', '12+'],
@@ -45,8 +41,6 @@ export const MOCK_PLAYGROUNDS = [
     city: 'Singen',
     country: 'DE',
     description: 'Abenteuerspielplatz mit Naturelementen.',
-    rating: 4.9,
-    reviews: 31,
     equipment: { slide: true, swing: false, sandbox: true, climbing: true, water: false },
     amenities: { shade: true, toilets: true, parking: true, restaurant: false },
     ageGroups: ['3-6', '6-12', '12+'],
@@ -60,8 +54,6 @@ export const MOCK_PLAYGROUNDS = [
     city: 'Stockach',
     country: 'DE',
     description: 'Idyllischer Spielplatz an der Aach mit Picknickbereich.',
-    rating: 4.3,
-    reviews: 14,
     equipment: { slide: false, swing: true, sandbox: true, climbing: false, water: true },
     amenities: { shade: false, toilets: true, parking: true, restaurant: true },
     ageGroups: ['0-3', '3-6'],
@@ -329,10 +321,12 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
             <div className="list-item-content">
               <h4 className="list-item-title">{pg.name}</h4>
               {pg.city && <p className="list-item-location">📍 {pg.city}</p>}
-              <div className="list-item-rating">
-                <span className="stars">{'🐾'.repeat(Math.round(pg.rating || 4))}</span>
-                {pg.rating && <span className="rating-value">{pg.rating}</span>}
-              </div>
+              {pg.rating && (
+                <div className="list-item-rating">
+                  <span className="stars">{'🐾'.repeat(Math.round(pg.rating))}</span>
+                  <span className="rating-value">{pg.rating}</span>
+                </div>
+              )}
               {pg.ageGroups && pg.ageGroups.length > 0 && (
                 <div className="age-badges">
                   {pg.ageGroups.map(age => (
@@ -355,7 +349,7 @@ const PlaygroundList = ({ playgrounds, onSelectPlayground, favorites, onToggleFa
   );
 };
 
-const PlaygroundModal = ({ playground, onClose }) => {
+const PlaygroundModal = ({ playground, activity, onClose, onOpenSandkasten }) => {
   if (!playground) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -381,6 +375,29 @@ const PlaygroundModal = ({ playground, onClose }) => {
                 <span key={age} className="age-badge">{age}</span>
               ))}
             </div>
+          )}
+          {activity && (
+            <div className="modal-activity">
+              <span className={`sk-pop-tag ${activity.tagType}`}>{activity.tag}</span>
+              <p className="sk-pop-text">{activity.latest}</p>
+              <button
+                className="sk-pop-btn modal-action-btn"
+                onClick={() => { if (typeof onOpenSandkasten === 'function') onOpenSandkasten(); }}
+              >
+                💬 Neuigkeiten im Sandkasten{activity.count ? ` (${activity.count})` : ''}
+              </button>
+            </div>
+          )}
+          {playground.standortlink && (
+            
+            <a
+              className="sk-pop-btn modal-action-btn modal-rate-btn"
+              href={playground.standortlink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⭐ Wie hat's dir gefallen? Bewertung abgeben
+            </a>
           )}
         </div>
       </div>
@@ -574,7 +591,9 @@ export default function JambinoMVP({ onOpenSandkasten }) {
 
       <PlaygroundModal
         playground={selectedPlayground}
+        activity={selectedPlayground ? (activityById.get(String(selectedPlayground.name)) || activityById.get(String(selectedPlayground.id))) : null}
         onClose={() => setSelectedPlayground(null)}
+        onOpenSandkasten={onOpenSandkasten}
       />
     </div>
   );

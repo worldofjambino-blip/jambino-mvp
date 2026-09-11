@@ -445,3 +445,22 @@ button:focus-visible {
   outline: 2px solid var(--jambino-orange);
   outline-offset: 2px;
 }
+
+.modal-activity {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-action-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: var(--spacing-sm);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.modal-rate-btn {
+  background: var(--jambino-green, #22C55E);
+}
