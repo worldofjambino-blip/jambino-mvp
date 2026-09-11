@@ -264,6 +264,7 @@ const SafeImage = ({ src, alt, className }) => {
       alt={alt}
       className={className}
       loading="lazy"
+      referrerPolicy="no-referrer"
       onError={() => setImgSrc(FALLBACK_IMAGE)}
     />
   );
