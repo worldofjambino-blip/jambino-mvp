@@ -480,8 +480,9 @@ export default function JambinoMVP({ onOpenSandkasten }) {
     return playgrounds.filter(pg => {
       const matchesSearch =
         pg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (pg.city && pg.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (pg.untergemeinde && pg.untergemeinde.toLowerCase().includes(searchTerm.toLowerCase()));
+        (pg.untergemeinde
+          ? pg.untergemeinde.toLowerCase().includes(searchTerm.toLowerCase())
+          : (pg.city && pg.city.toLowerCase().includes(searchTerm.toLowerCase())));
       if (!matchesSearch) return false;
       if (filters.ageGroups.length > 0) {
         const selectedRanges = filters.ageGroups.map(a => CHIP_RANGES[a]).filter(Boolean);
