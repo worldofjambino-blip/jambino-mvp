@@ -500,7 +500,7 @@ export default function SandkastenPage() {
           >
             <option value="">📍 Spielplatz wählen…</option>
             {playgrounds.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+              <option key={p.id} value={p.id}>{p.name}{(p.city || p.untergemeinde) ? " – " + (p.city || p.untergemeinde) : ""}</option>
             ))}
           </select>
           <textarea
