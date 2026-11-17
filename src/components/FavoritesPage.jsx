@@ -205,7 +205,7 @@ export default function FavoritesPage({ onDiscover }) {
               <div key={pg.id} className="fav-card">
                 <div className="fav-card-media">
                   <img
-                    src="/jambino-placeholder.png"
+                    src={pg.bildUrl && pg.bildUrl.startsWith('http') ? pg.bildUrl : '/jambino-placeholder.png'}
                     alt={pg.name}
                     className="fav-card-image"
                     loading="lazy"
